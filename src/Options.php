@@ -489,26 +489,26 @@ class Options implements \Dxw\Iguana\Registerable
                 ],
             ];
 
-            $taxonomyFieldsTaxonomyConfig = [
-                'key' => 'cache_control_taxonomy_'.$taxonomy->name.'_settings',
-                'label' => $taxonomy->label.' ('.$taxonomy->name.') Settings',
-                'name' => 'cache_control'.$taxonomy->name.'_settings',
-                'type' => 'group',
-                'instructions' => '',
-                'required' => 0,
-                'conditional_logic' => 0,
-                'wrapper' => [
-                    'width' => '',
-                    'class' => '',
-                    'id' => '',
-                ],
-                'layout' => 'block',
-                'sub_fields' => $taxonomySubFields,
-            ];
-            $taxonomyFields[] = $taxonomyFieldsTaxonomyConfig;
-        }
-        return $taxonomyFields;
-    }
+			$taxonomyFieldsTaxonomyConfig = [
+				'key' => 'cache_control_taxonomy_'.$taxonomy->name.'_settings',
+				'label' => $taxonomy->label.' ('.$taxonomy->name.') Settings',
+				'name' => 'cache_control_'.$taxonomy->name.'_settings',
+				'type' => 'group',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => [
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				],
+				'layout' => 'block',
+				'sub_fields' => $taxonomySubFields,
+			];
+			$taxonomyFields[] = $taxonomyFieldsTaxonomyConfig;
+		}
+		return $taxonomyFields;
+	}
 
     protected function getTemplatesConfig(array $ageOptions) :array
     {
