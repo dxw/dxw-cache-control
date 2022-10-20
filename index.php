@@ -1,16 +1,16 @@
 <?php
 /**
- * WordPress Plugin
+ * Cache Control
  *
- * @package     WordPressPlugin
+ * @package     CacheControl
  * @author      dxw
  * @copyright   2020
  * @license     MIT
  *
  * @wordpress-plugin
- * Plugin Name: WordPress Plugin
- * Plugin URI: https://github.com/dxw/wordpress-plugin
- * Description: TODO
+ * Plugin Name: DXW Cache Control
+ * Plugin URI: https://github.com/dxw/dxw-cache-control
+ * Description: Set the Cache control headers by content type, taxonomy, template etc.
  * Author: dxw
  * Version: 0.1.0
  * Network: True
