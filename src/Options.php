@@ -28,7 +28,9 @@ class Options implements \Dxw\Iguana\Registerable
 
     public function addOptions() : void
     {
-        $this->templates = acf_get_post_templates();
+		if (function_exists('acf_get_post_templates')) {
+			$this->templates = acf_get_post_templates();
+		}
         $ageOptions = [
             'default'   => 'Default',
             120 		=> '2 mins',
