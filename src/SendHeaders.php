@@ -36,7 +36,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
 				if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
 					$this->currentConfig = 'frontPage';
-					$this->maxAge = $this->frontPageCacheAge;
+					$this->maxAge = (int) $this->frontPageCacheAge;
 				}
 				if ($this->developerMode) {
 					header('Meta-cc-front-page-cache-value: ' . $this->frontPageCacheAge);
@@ -190,7 +190,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				($this->currentConfig == 'taxonomy' && $templateConfig['overridesTaxonomy'])
 			) {
 				$this->currentConfig = 'template';
-				$this->maxAge = $taxonomyConfig['maxAge'];
+				$this->maxAge = $postTypeConfig['maxAge'];
 			}
 		}
 		if ($this->developerMode) {
@@ -209,7 +209,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 					$this->archiveCacheAge = get_field('cache_control_plugin_archives_cache', 'option');
 					if ($this->archiveCacheAge && $this->archiveCacheAge != 'default') {
 						$this->currentConfig = 'archive';
-						$this->maxAge = $this->archiveCacheAge;
+						$this->maxAge = (int) $this->archiveCacheAge;
 						if ($this->developerMode) {
 							header('Meta-cc-archive-cache-value: ' . $this->archiveCacheAge);
 						}
@@ -222,7 +222,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			$this->homePageCacheAge = get_field('cache_control_plugin_home_page_cache', 'option');
 			if ($this->homePageCacheAge && $this->homePageCacheAge != 'default') {
 				$this->currentConfig = 'homePage';
-				$this->maxAge = $this->homePageCacheAge;
+				$this->maxAge = (int) $this->homePageCacheAge;
 				if ($this->developerMode) {
 					header('Meta-cc-home-page-cache-value: ' . $this->homePageCacheAge);
 				}
