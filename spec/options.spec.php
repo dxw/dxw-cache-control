@@ -47,12 +47,11 @@ describe(\CacheControl\Options::class, function () {
 				allow('acf_get_post_templates')->toBeCalled()->andReturn(['page' => []]);
 				expect('acf_get_post_templates')->toBeCalled()->once();
 				allow('acf_add_local_field_group')->toBeCalled();
-				allow($this->options)->toReceive('hasCustomTemplates')->andReturn(false);
 				expect('acf_add_local_field_group')->toBeCalled()->times(3)->with(\Kahlan\Arg::toBeAn('array'));
 				allow('get_post_types')->toBeCalled()->andReturn(
 					[
 						'post' => (object)['name' => 'post', 'label' => 'Post'],
-						'page' => (object)['name' => 'post', 'label' => 'Post']
+						'page' => (object)['name' => 'page', 'label' => 'Page']
 					]
 				);
 				expect('get_post_types')->toBeCalled()->once()->with(['public' => true], 'objects');
@@ -74,13 +73,12 @@ describe(\CacheControl\Options::class, function () {
 					->andReturn(['page' => ['Custom Template' => 'custom-template.php']]);
 				expect('acf_get_post_templates')->toBeCalled()->once();
 				allow('acf_add_local_field_group')->toBeCalled();
-				allow($this->options)->toReceive('hasCustomTemplates')->andReturn(true);
 				expect('acf_add_local_field_group')->toBeCalled()->times(4)->with(\Kahlan\Arg::toBeAn('array'));
 
 				allow('get_post_types')->toBeCalled()->andReturn(
 					[
 						'post' => (object)['name' => 'post', 'label' => 'Post'],
-						'page' => (object)['name' => 'post', 'label' => 'Post']
+						'page' => (object)['name' => 'page', 'label' => 'Page']
 					]
 				);
 				expect('get_post_types')->toBeCalled()->once()->with(['public' => true], 'objects');

@@ -13,11 +13,6 @@ class Options implements \Dxw\Iguana\Registerable
 		add_action('init', [$this, 'addOptions'], 999);
 	}
 
-	private function hasCustomTemplates(): bool
-	{
-		return $this->hasCustomTemplates;
-	}
-
 	public function addOptionsPage(): void
 	{
 		if (function_exists('acf_add_options_page')) {
@@ -220,7 +215,7 @@ class Options implements \Dxw\Iguana\Registerable
 					'show_in_rest' => 0,
 				]);
 
-			if ($this->hasCustomTemplates()) {
+			if ($this->hasCustomTemplates) {
 				acf_add_local_field_group([
 						'key' => 'group_cache_control_template_settings',
 						'title' => 'Cache Control Template Settings',
