@@ -87,7 +87,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-is-admin: ' . ($this->pageProperties['isAdmin'] ? 'yes' : 'no'));
 			header('Meta-cc-logged-in-user: ' . ($this->pageProperties['isLoggedInUser'] ? 'yes' : 'no'));
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
-			header('meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
+			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
 		}
 	}
 
