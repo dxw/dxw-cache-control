@@ -161,7 +161,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			}
 		}
 		if ($taxonomyConfig['maxAge'] != 'default' && $postTypeConfig['overriddenByTaxonomy']) {
-			$this->currentConfig= 'taxonomy';
+			$this->currentConfig = 'taxonomy';
 			$this->maxAge = $taxonomyConfig['maxAge'];
 		}
 		if ($this->developerMode) {
@@ -190,9 +190,10 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				($this->currentConfig == 'taxonomy' && $templateConfig['overridesTaxonomy'])
 			) {
 				$this->currentConfig = 'template';
-				$this->maxAge = $postTypeConfig['maxAge'];
+				$this->maxAge = $templateConfig['maxAge'];
 			}
 		}
+
 		if ($this->developerMode) {
 			header('Meta-cc-config-template-max-age: ' . $templateConfig['maxAge']);
 			header('Meta-cc-config-taxonomy-priority: ' . ($templateConfig['overridesTaxonomy'] ? 'yes' : 'no'));
