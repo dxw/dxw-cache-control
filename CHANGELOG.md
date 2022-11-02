@@ -6,3 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2022-10-20
 - Initial release
+
+## [0.1.1] - 2022-11-02
+### Added
+- Kahlan test suite for the plugin classes
+
+### Changed
+- Logic surrounding applied taxonomy configs where post_type is unconfigured
+- Make the call to populate the templates array safer, by checking that the function exists
+- Tidy taxonomy type group name
+- Make the Meta-cc headers consistent
+
+### Fixed
+- Fix namespacing in composer.json
+- Fix fatal error caused by passing a string where int expected
+- Fix a bug in the taxonomy processing 
+- Fix bug in template config logic
