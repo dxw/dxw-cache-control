@@ -150,8 +150,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 						the_row();
 						if (get_sub_field('cache_control_taxonomy_' . $taxonomy . '_cache_ignore') == false) {
 							$localMaxAge = get_sub_field('cache_control_taxonomy_' . $taxonomy . '_cache_age');
-							$localPriority = 'cache_control_taxonomy_' . $taxonomy . '_priority';
-							if ($localMaxAge != 'default' && $localMaxAge < $taxonomyConfig['priority']) {
+							$localPriority = get_sub_field('cache_control_taxonomy_' . $taxonomy . '_priority');
+							if ($localMaxAge != 'default' && $localPriority < $taxonomyConfig['priority']) {
 								$taxonomyConfig['maxAge'] = $localMaxAge;
 								$taxonomyConfig['priority'] = $localPriority;
 							}
