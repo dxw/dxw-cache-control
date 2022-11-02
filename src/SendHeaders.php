@@ -7,6 +7,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected int $maxAge = 86400;
 	protected bool $overridesArchive = false;
 	protected bool $developerMode = false;
+	protected bool $overriddenByTaxonomy = false;
 	protected string $currentConfig = 'default';
 	protected array $pageProperties = [];
 	protected string $homePageCacheAge = 'default';
@@ -132,6 +133,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 					$this->currentConfig = 'postType';
 					$this->maxAge = $postTypeConfig['maxAge'];
 					$this->overridesArchive = $postTypeConfig['overridesArchive'];
+					$this->overriddenByTaxonomy = $postTypeConfig['overriddenByTaxonomy'];
 				}
 			}
 		}
@@ -160,7 +162,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				}
 			}
 		}
-		if ($taxonomyConfig['maxAge'] != 'default' && $postTypeConfig['overriddenByTaxonomy']) {
+		if ($taxonomyConfig['maxAge'] != 'default' && $this->overriddenByTaxonomy) {
 			$this->currentConfig = 'taxonomy';
 			$this->maxAge = $taxonomyConfig['maxAge'];
 		}
