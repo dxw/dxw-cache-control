@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2022-10-20
 - Initial release
 
-## [0.1.1] - 2022-11-02
+## [0.1.1] - 2022-11-xx
 ### Added
 - Kahlan test suite for the plugin classes
 
@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make the call to populate the templates array safer, by checking that the function exists
 - Tidy taxonomy type group name
 - Make the Meta-cc headers consistent
+- Use the send_headers action rather than template_redirect (requires wordpress 6.1 or greater)
 
 ### Fixed
 - Fix namespacing in composer.json

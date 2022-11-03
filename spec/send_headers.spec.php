@@ -95,7 +95,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 		it('adds an action', function () {
 			allow('add_action')->toBeCalled();
 			expect('add_action')->toBeCalled()->once()->with(
-				'template_redirect',
+				'send_headers',
 				[
 					$this->sendHeaders,
 					'setCacheHeader'

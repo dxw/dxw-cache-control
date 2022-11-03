@@ -16,7 +16,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	public function register(): void
 	{
-		add_action('template_redirect', [$this, 'setCacheHeader']);
+		add_action('send_headers', [$this, 'setCacheHeader']);
 	}
 
 	public function setCacheHeader(): void
