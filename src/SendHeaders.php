@@ -39,8 +39,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		if (count($this->pageProperties)) {
 			// if we are logged in, or on the front page we don't need to worry about configuring things further
-			if ($this->pageProperties['isLoggedInUser'] && !$this->developerMode) {
-				header('Cache-Control: no-cache, private');
+			if (
+				($this->pageProperties['isLoggedInUser'] || $this->pageProperties['requiresPassword'])
+				&& !$this->developerMode
+			) {
+				header('Cache-Control: no-cache, no-store, private');
 				return;
 			}
 
@@ -73,12 +76,22 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			if ($this->pageProperties['isLoggedInUser']) {
 				header('Meta-cc-configured-cache: no-cache (logged in user)');
 			}
+			if ($this->pageProperties['requiresPassword']) {
+				header('Meta-cc-configured-cache: no-cache (requires password)');
+			}
 			if ($this->developerMode) {
 				header('Meta-cc-currently-used-config: ' . $this->currentConfig);
 				header('Meta-cc-final-configured-max-age: ' . $this->maxAge);
 			}
 		}
 		header('Cache-Control: max-age=' . $this->maxAge .', public');
+	}
+
+	protected function hasPassword(): bool
+	{
+		global $post;
+
+		return !empty($post->post_password);
 	}
 
 	/**
@@ -99,6 +112,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			'postType' => get_post_type() ?? 'unknown',
 			'taxonomies' => get_post_taxonomies() ?? ['none'],
 			'templateName' => get_page_template_slug() ?: 'default',
+			'requiresPassword' => $this->hasPassword(),
 		];
 
 		// If we are in developer mode we want to see what the current page is setting.
@@ -111,6 +125,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-is-admin: ' . ($this->pageProperties['isAdmin'] ? 'yes' : 'no'));
 			header('Meta-cc-logged-in-user: ' . ($this->pageProperties['isLoggedInUser'] ? 'yes' : 'no'));
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
+			header('Meta-cc-requires-password: ' . ($this->pageProperties['requiresPassword'] ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
 		}
 	}

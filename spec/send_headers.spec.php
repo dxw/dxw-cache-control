@@ -148,7 +148,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->once();
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -157,7 +157,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->once();
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->getContext($this->headers['no-cache']);
 				$this->sendHeaders->setCacheHeader();
@@ -167,7 +167,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->once();
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->getContext($this->headers['cache']);
 				$this->sendHeaders->setCacheHeader();
@@ -194,6 +194,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('header')->toBeCalled()->once()->with('Meta-cc-is-admin: no');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-logged-in-user: yes');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-template_name: default');
+				expect('header')->toBeCalled()->once()->with('Meta-cc-requires-password: no');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-post-types: post,page,custom-post');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-front-page-cache-value: default');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-configured-max-age: 86400');
@@ -211,7 +212,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(2);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(15);
+				expect('header')->toBeCalled()->times(16);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -222,7 +223,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(2);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(15);
+				expect('header')->toBeCalled()->times(16);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -231,7 +232,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('production');
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -252,7 +253,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(26);
+				expect('header')->toBeCalled()->times(27);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -313,6 +314,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 					expect('header')->toBeCalled()->once()->with('Meta-cc-is-admin: no');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-logged-in-user: no');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-template_name: default');
+					expect('header')->toBeCalled()->once()->with('Meta-cc-requires-password: no');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-post-types: post,page,custom-post');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-front-page-cache-value: default');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-configured-max-age: 86400');
@@ -354,6 +356,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 					expect('header')->toBeCalled()->once()->with('Meta-cc-is-admin: no');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-logged-in-user: no');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-template_name: default');
+					expect('header')->toBeCalled()->once()->with('Meta-cc-requires-password: no');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-post-types: post,page,custom-post');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-front-page-cache-value: 3600');
 					expect('header')->toBeCalled()->once()->with('Meta-cc-configured-max-age: 3600');
@@ -606,6 +609,15 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=120, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+
+				it('is a password protected page', function () {
+					allow($this->sendHeaders)->toReceive('hasPassword')->andReturn(true);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 					$this->sendHeaders->setCacheHeader();
 				});
