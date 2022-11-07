@@ -53,6 +53,15 @@ describe(\CacheControl\SendHeaders::class, function () {
 			]
 		];
 
+		$this->headers = [
+			'no-cache' => [
+				'Cache-Control' => 'no-cache, must-revalidate, max-age=0'
+			],
+			'cache' => [
+				'Cache-Control' => 'max-age=60'
+			]
+		];
+
 		$this->currentSubConfig = [];
 		$this->key = '';
 		$this->row = '';
@@ -92,17 +101,39 @@ describe(\CacheControl\SendHeaders::class, function () {
 	});
 
 	describe('->register()', function () {
-		it('adds an action', function () {
+		it('adds an action and a filter', function () {
+			allow('add_filter')->toBeCalled();
 			allow('add_action')->toBeCalled();
+			expect('add_filter')->toBeCalled()->once()->with(
+				'wp_headers',
+				[
+					$this->sendHeaders,
+					'getContext'
+				],
+				99
+			);
 			expect('add_action')->toBeCalled()->once()->with(
 				'send_headers',
 				[
 					$this->sendHeaders,
-					'setCacheHeader'
-				]
+					'setCacheHeader',
+				],
+				1
 			);
 
 			$this->sendHeaders->register();
+		});
+	});
+
+	describe('->getContext()', function () {
+		it('passed in array is empty', function () {
+			$result = $this->sendHeaders->getContext([]);
+			expect($result)->toEqual([]);
+		});
+
+		it('passed in array has values', function () {
+			$result = $this->sendHeaders->getContext($this->headers['no-cache']);
+			expect($result)->toEqual($this->headers['no-cache']);
 		});
 	});
 
@@ -118,6 +149,26 @@ describe(\CacheControl\SendHeaders::class, function () {
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
 
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('is not in developer mode and wp_headers has been used and set no-cache', function () {
+				expect('get_field')->toBeCalled()->once();
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
+
+				$this->sendHeaders->getContext($this->headers['no-cache']);
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('is not in developer mode and wp_headers has been used and set a cache', function () {
+				expect('get_field')->toBeCalled()->once();
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
+
+				$this->sendHeaders->getContext($this->headers['cache']);
 				$this->sendHeaders->setCacheHeader();
 			});
 
@@ -146,6 +197,31 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
 
 				$this->sendHeaders->setCacheHeader();
+			});
+		});
+
+		context("We don't have a logged in user and the wp_headers filter has values", function () {
+			beforeEach(function () {
+				// for simplicities sake we are using the front page for this example.
+				allow('is_front_page')->toBeCalled()->andReturn(true);
+			});
+			it('sets a cache-control header with no-cache', function () {
+				// we expect nothing to happen in this instance.
+
+				$this->sendHeaders->getContext($this->headers['no-cache']);
+				$result = $this->sendHeaders->setCacheHeader();
+				expect($result)->toEqual(null);
+			});
+
+			it('sets a cache-control header with a cache', function () {
+				expect('get_field')->toBeCalled()->times(2);
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+				$this->sendHeaders->getContext($this->headers['cache']);
+				$result = $this->sendHeaders->setCacheHeader();
+				expect($result)->toEqual(null);
 			});
 		});
 

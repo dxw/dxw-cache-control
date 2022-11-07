@@ -12,7 +12,7 @@
  * Plugin URI: https://github.com/dxw/dxw-cache-control
  * Description: Set the Cache control headers by content type, taxonomy, template etc.
  * Author: dxw
- * Version: 0.1.1
+ * Version: 0.1.2
  * Network: True
  */
 

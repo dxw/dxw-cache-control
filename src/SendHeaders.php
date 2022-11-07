@@ -13,10 +13,19 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected string $homePageCacheAge = 'default';
 	protected string $frontPageCacheAge = 'default';
 	protected string $archiveCacheAge = 'default';
+	protected array $headers = [];
 
 	public function register(): void
 	{
-		add_action('send_headers', [$this, 'setCacheHeader']);
+		add_filter('wp_headers', [$this, 'getContext'], 99);
+		add_action('send_headers', [$this, 'setCacheHeader'], 1);
+	}
+
+	// get any headers that have been set by filters
+	public function getContext(array $headers): array
+	{
+		$this->headers = $headers;
+		return $headers;
 	}
 
 	public function setCacheHeader(): void
@@ -30,6 +39,18 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			// if we are logged in, or on the front page we don't need to worry about configuring things further
 			if ($this->pageProperties['isLoggedInUser'] && !$this->developerMode) {
 				header('Cache-Control: no-cache, private');
+				return;
+			}
+
+			/*
+			 * If something is setting no-cache using the wp_headers filter
+			 * we don't want to mess with that
+			 */
+			if (
+				!$this->pageProperties['isLoggedInUser']
+				&& array_key_exists('Cache-Control', $this->headers)
+				&& preg_match('/no-cache/', $this->headers['Cache-Control'])
+			) {
 				return;
 			}
 
