@@ -46,6 +46,29 @@ class Options implements \Dxw\Iguana\Registerable
 
 		if (function_exists('acf_add_local_field_group')):
 
+			$developer_mode = [];
+			if (wp_get_environment_type() != 'production') {
+				$developer_mode = [
+					'key' => 'field_cache_control_plugin_settings-developer_mode',
+					'label' => 'Developer mode',
+					'name' => 'cache_control_plugin_developer_mode',
+					'type' => 'true_false',
+					'instructions' => 'Output additional headers for development purposes',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => [
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					],
+					'message' => '',
+					'default_value' => 0,
+					'ui' => 0,
+					'ui_on_text' => '',
+					'ui_off_text' => '',
+				];
+			}
+
 			acf_add_local_field_group([
 				'key' => 'group_cache_control_global_settings',
 				'title' => 'Cache Control Global Settings',
@@ -67,25 +90,7 @@ class Options implements \Dxw\Iguana\Registerable
 						'new_lines' => 'wpautop',
 						'esc_html' => 0,
 					],
-					[
-						'key' => 'field_cache_control_plugin_settings-developer_mode',
-						'label' => 'Developer mode',
-						'name' => 'cache_control_plugin_developer_mode',
-						'type' => 'true_false',
-						'instructions' => 'Output additional headers for development purposes',
-						'required' => 0,
-						'conditional_logic' => 0,
-						'wrapper' => [
-							'width' => '',
-							'class' => '',
-							'id' => '',
-						],
-						'message' => '',
-						'default_value' => 0,
-						'ui' => 0,
-						'ui_on_text' => '',
-						'ui_off_text' => '',
-					],
+					$developer_mode,
 					[
 						'key' => 'field_cache_control_plugin_settings-front_page_cache',
 						'label' => 'Front page cache',

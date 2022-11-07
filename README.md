@@ -17,7 +17,7 @@ The default cache max-age is set to 24 hours, other than the front page config, 
 The front page config is always respected, regardless of other configuration, even if it is set to the default value.
 
 ### Global options
-- Developer mode flag: Disables the Logged In User override, so do not set on production, outputs various headers with the prefix 'Meta-cc' that provide information on page properties and config state.
+- Developer mode flag: Disables the Logged In User override (not available production), outputs various headers with the prefix 'Meta-cc' that provide information on page properties and config state.
 - Front Page Cache: Sets the max-age for the configured front page of the site.
 - Home Page Cache: Sets the max-age for the configured home page of the site (see [Wordpress function reference: is_home()](https://developer.wordpress.org/reference/functions/is_home/)) for details.
 - Archive Cache: Sets the max-age value for archive pages.
@@ -78,4 +78,14 @@ Run the linters:
 ```
 vendor/bin/psalm
 vendor/bin/php-cs-fixer fix
+```
+
+Make developer mode available locally:
+in ```/config/server-local.php``` in your local instance
+```
+define('WP_ENVIRONMENT_TYPE', 'local');
+```
+or
+```
+define('WP_ENVIRONMENT_TYPE', 'development');
 ```
