@@ -13,6 +13,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 		allow('get_post_taxonomies')->toBeCalled()->andReturn(['category', 'post_tag', 'custom-taxonomy']);
 		allow('get_page_template_slug')->toBeCalled()->andReturn('default');
 		allow('get_post_types')->toBeCalled()->andReturn(['post', 'page', 'custom-post']);
+		allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
 
 		$this->config = [
 			'cache_control_plugin_developer_mode' => false,
@@ -171,11 +172,16 @@ describe(\CacheControl\SendHeaders::class, function () {
 				$this->sendHeaders->getContext($this->headers['cache']);
 				$this->sendHeaders->setCacheHeader();
 			});
+		});
 
-			it('is in developer mode', function () {
+		context('Testing developer-mode', function () {
+			beforeEach(function () {
+				allow('is_user_logged_in')->toBeCalled()->andReturn(true);
 				$this->config['cache_control_plugin_developer_mode'] = true;
 				allow('is_front_page')->toBeCalled()->andReturn(true);
+			});
 
+			it('is in developer mode on the local dev environment', function () {
 				expect('get_post_types')->toBeCalled()->once();
 				expect('get_field')->toBeCalled()->times(2);
 
@@ -195,6 +201,58 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('header')->toBeCalled()->once()->with('Meta-cc-currently-used-config: default');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-final-configured-max-age: 86400');
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('is on the development environment', function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('development');
+				expect('get_post_types')->toBeCalled()->once();
+				expect('get_field')->toBeCalled()->times(2);
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->times(15);
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('is on the staging environment', function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('staging');
+				expect('get_post_types')->toBeCalled()->once();
+				expect('get_field')->toBeCalled()->times(2);
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->times(15);
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('is on the production environment', function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('production');
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, private');
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			// this is the option that gives us the max number of dev-mode headers
+			// so we test this to check that we are the number of headers we expect
+			it('is in developer-mode and we are on a home page that is an archive', function () {
+				$this->config['cache_control_plugin_archives_cache'] = 120;
+				$this->config['cache_control_plugin_home_page_cache'] = 3600;
+
+				allow('is_home')->toBeCalled()->andReturn(true);
+				allow('is_post_type_archive')->toBeCalled()->andReturn(true);
+				$this->config['cache_control_plugin_developer_mode'] = true;
+				allow('is_front_page')->toBeCalled()->andReturn(false);
+				allow('get_page_template_slug')->toBeCalled()->andReturn('custom-template.php');
+
+				expect('get_post_types')->toBeCalled()->once();
+				expect('get_field')->toBeCalled()->times(3);
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->times(26);
 
 				$this->sendHeaders->setCacheHeader();
 			});

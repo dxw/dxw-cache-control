@@ -3,6 +3,7 @@
 describe(\CacheControl\Options::class, function () {
 	beforeEach(function () {
 		$this->options = new \CacheControl\Options();
+		allow('wp_get_environment_type')->toBeCalled()->andReturn('production');
 	});
 
 	it('is registerable', function () {
