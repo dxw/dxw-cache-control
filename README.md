@@ -81,6 +81,7 @@ vendor/bin/php-cs-fixer fix
 ```
 
 Make developer mode available locally:
+
 in ```/config/server-local.php``` in your local instance
 ```
 define('WP_ENVIRONMENT_TYPE', 'local');
