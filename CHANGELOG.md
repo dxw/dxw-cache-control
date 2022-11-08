@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Kahlan test suite for the plugin classes
 - Checks that the wp_headers filter hasn't modified to cache-control header to no-cache
+- Ensure developer-mode can't be configured or run on production instances
+- Sane cache configuration for posts or pages with password protection.
 
 ### Changed
 - Logic surrounding applied taxonomy configs where post_type is unconfigured
