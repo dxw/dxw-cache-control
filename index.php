@@ -4,7 +4,7 @@
  *
  * @package     CacheControl
  * @author      dxw
- * @copyright   2020
+ * @copyright   2022
  * @license     MIT
  *
  * @wordpress-plugin
@@ -13,6 +13,7 @@
  * Description: Set the Cache control headers by content type, taxonomy, template etc.
  * Author: dxw
  * Version: 0.1.1
+ * Requires at least: 6.1
  * Network: True
  */
 
