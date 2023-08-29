@@ -60,7 +60,9 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			}
 
 			if ($this->pageProperties['isFrontPage']) {
-				$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
+				if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
+					$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
+				}
 				if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
 					$this->currentConfig = 'frontPage';
 					$this->maxAge = (int) $this->frontPageCacheAge;
@@ -247,7 +249,9 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			} else {
 				// Does the pastType override archive settings;
 				if (!$this->overridesArchive) {
-					$this->archiveCacheAge = get_field('cache_control_plugin_archives_cache', 'option');
+					if (is_string(get_field('cache_control_plugin_archives_cache', 'option'))) {
+						$this->archiveCacheAge = get_field('cache_control_plugin_archives_cache', 'option');
+					}
 					if ($this->archiveCacheAge && $this->archiveCacheAge != 'default') {
 						$this->currentConfig = 'archive';
 						$this->maxAge = (int) $this->archiveCacheAge;
@@ -260,7 +264,9 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 
 		if ($this->pageProperties['isHomePage']) {
-			$this->homePageCacheAge = get_field('cache_control_plugin_home_page_cache', 'option');
+			if (is_string(get_field('cache_control_plugin_home_page_cache', 'option'))) {
+				$this->homePageCacheAge = get_field('cache_control_plugin_home_page_cache', 'option');
+			}
 			if ($this->homePageCacheAge && $this->homePageCacheAge != 'default') {
 				$this->currentConfig = 'homePage';
 				$this->maxAge = (int) $this->homePageCacheAge;
