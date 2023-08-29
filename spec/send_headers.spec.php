@@ -183,7 +183,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			it('is in developer mode on the local dev environment', function () {
 				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(2);
+				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Meta-cc-post-type: post');
@@ -209,7 +209,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			it('is on the development environment', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('development');
 				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(2);
+				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->times(16);
@@ -220,7 +220,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			it('is on the staging environment', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('staging');
 				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(2);
+				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->times(16);
@@ -253,7 +253,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(27);
+				expect('header')->toBeCalled()->times(25);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -273,7 +273,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			});
 
 			it('sets a cache-control header with a cache', function () {
-				expect('get_field')->toBeCalled()->times(2);
+				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
@@ -291,7 +291,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			context('has a config value of default', function () {
 				it('is not in developer mode', function () {
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
@@ -303,7 +303,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 					$this->config['cache_control_plugin_developer_mode'] = true;
 
 					expect('get_post_types')->toBeCalled()->once();
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Meta-cc-post-type: post');
@@ -332,7 +332,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('is not in developer mode', function () {
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=3600, public');
@@ -345,7 +345,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 					allow('is_front_page')->toBeCalled()->andReturn(true);
 
 					expect('get_post_types')->toBeCalled()->once();
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Meta-cc-post-type: post');
@@ -376,7 +376,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			});
 
 			it('There is no non-default configuration', function () {
-				expect('get_field')->toBeCalled()->times(3);
+				expect('get_field')->toBeCalled()->times(5);
 				expect('get_sub_field')->toBeCalled()->times(11);
 
 				allow('header')->toBeCalled();
@@ -387,11 +387,11 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			context('home page is configured', function () {
 				beforeEach(function () {
-					$this->config['cache_control_plugin_home_page_cache'] = 3600;
+					$this->config['cache_control_plugin_home_page_cache'] = '3600';
 				});
 
 				it('is configured, with no other configuration', function () {
-					expect('get_field')->toBeCalled()->times(3);
+					expect('get_field')->toBeCalled()->times(5);
 					expect('get_sub_field')->toBeCalled()->times(11);
 
 					allow('header')->toBeCalled();
@@ -401,12 +401,12 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('is configured, other applicable configurations are present', function () {
-					$this->config['cache_control_plugin_archives_cache'] = 120;
+					$this->config['cache_control_plugin_archives_cache'] = '120';
 					$this->config['cache_control_post_type_page_settings']['cache_control_post_type_page_cache_age'] = 900;
 					$this->config['cache_control_post_type_page_settings']['cache_control_post_type_page_overridden_by_taxonomy'] = true;
 					$this->config['cache_control_taxonomy_category_settings']['cache_control_taxonomy_category_cache_age'] = 1800;
 
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 					expect('get_sub_field')->toBeCalled()->times(11);
 
 					allow('header')->toBeCalled();
@@ -417,7 +417,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 				it('is configured is also the front page which has default config', function () {
 					allow('is_front_page')->toBeCalled()->andReturn(true);
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
@@ -428,7 +428,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				it('is configured is also the front page which has config of 1hr', function () {
 					allow('is_front_page')->toBeCalled()->andReturn(true);
 					$this->config['cache_control_plugin_front_page_cache'] = '3600';
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=3600, public');
@@ -443,9 +443,9 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('archive is configured', function () {
-					$this->config['cache_control_plugin_archives_cache'] = 120;
+					$this->config['cache_control_plugin_archives_cache'] = '120';
 
-					expect('get_field')->toBeCalled()->times(3);
+					expect('get_field')->toBeCalled()->times(5);
 					expect('get_sub_field')->toBeCalled()->times(11);
 
 					allow('header')->toBeCalled();
@@ -462,7 +462,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			});
 
 			it('There is no non-default configuration', function () {
-				expect('get_field')->toBeCalled()->times(2);
+				expect('get_field')->toBeCalled()->times(3);
 				expect('get_sub_field')->toBeCalled()->times(11);
 
 				allow('header')->toBeCalled();
@@ -473,14 +473,14 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			context('archive is configured', function () {
 				beforeEach(function () {
-					$this->config['cache_control_plugin_archives_cache'] = 120;
+					$this->config['cache_control_plugin_archives_cache'] = '120';
 					$this->config['cache_control_post_type_post_settings']['cache_control_post_type_post_cache_age'] = 900;
 					$this->config['cache_control_post_type_post_settings']['cache_control_post_type_post_overridden_by_taxonomy'] = true;
 					$this->config['cache_control_template_custom-post_settings']['cache_control_template_custom-post_cache_age'] = 7200;
 				});
 
 				it("isn't overridden by post_type, no taxonomy is configured", function () {
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 					expect('get_sub_field')->toBeCalled()->times(11);
 
 					allow('header')->toBeCalled();
@@ -531,7 +531,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('post type configured, no taxonomy configured', function () {
-					expect('get_field')->toBeCalled()->times(2);
+					expect('get_field')->toBeCalled()->times(3);
 					expect('get_sub_field')->toBeCalled()->times(11);
 
 					allow('header')->toBeCalled();
