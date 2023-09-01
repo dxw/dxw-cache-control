@@ -367,6 +367,41 @@ describe(\CacheControl\SendHeaders::class, function () {
 					$this->sendHeaders->setCacheHeader();
 				});
 			});
+
+			context('config values are incorrectly set', function () {
+				it('config values are unset (return null)', function () {
+					$this->config['cache_control_plugin_front_page_cache'] = null;
+
+					expect('get_field')->toBeCalled()->times(2);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+
+				it('config values are set incorrectly (return int)', function () {
+					$this->config['cache_control_plugin_front_page_cache'] = 3600;
+
+					expect('get_field')->toBeCalled()->times(2);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+
+				it('config values are set incorrectly (return array)', function () {
+					$this->config['cache_control_plugin_front_page_cache'] = [];
+
+					expect('get_field')->toBeCalled()->times(2);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+			});
 		});
 
 		context('serving the home_page', function () {
@@ -454,6 +489,41 @@ describe(\CacheControl\SendHeaders::class, function () {
 					$this->sendHeaders->setCacheHeader();
 				});
 			});
+
+			context('config values are incorrectly set', function () {
+				it('config values are unset (return null)', function () {
+					$this->config['cache_control_plugin_home_page_cache'] = null;
+
+					expect('get_field')->toBeCalled()->times(4);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+
+				it('config values are set incorrectly (return int)', function () {
+					$this->config['cache_control_plugin_home_page_cache'] = 3600;
+
+					expect('get_field')->toBeCalled()->times(4);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+
+				it('config values are set incorrectly (return array)', function () {
+					$this->config['cache_control_plugin_home_page_cache'] = [];
+
+					expect('get_field')->toBeCalled()->times(4);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+			});
 		});
 
 		context('archive page tests', function () {
@@ -469,6 +539,42 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
 
 				$this->sendHeaders->setCacheHeader();
+			});
+
+
+			context('config values are incorrectly set', function () {
+				it('config values are unset (return null)', function () {
+					$this->config['cache_control_plugin_archives_cache'] = null;
+
+					expect('get_field')->toBeCalled()->times(2);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+
+				it('config values are set incorrectly (return int)', function () {
+					$this->config['cache_control_plugin_archives_cache'] = 3600;
+
+					expect('get_field')->toBeCalled()->times(2);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
+
+				it('config values are set incorrectly (return array)', function () {
+					$this->config['cache_control_plugin_archives_cache'] = [];
+
+					expect('get_field')->toBeCalled()->times(2);
+
+					allow('header')->toBeCalled();
+					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+					$this->sendHeaders->setCacheHeader();
+				});
 			});
 
 			context('archive is configured', function () {
