@@ -97,6 +97,19 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	}
 
 	/**
+	 * @psalm-suppress ArgumentTypeCoercion
+	 */
+	protected function getPostId(): int
+	{
+		$post = get_post();
+
+		if (is_a($post, 'WP_Post')) {
+			return $post->ID;
+		}
+		return 0;
+	}
+
+	/**
 	 * getPageProperties
 	 *
 	 * Populate our page properties for the page we are on, set $this->pageValues.
@@ -115,6 +128,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			'taxonomies' => get_post_taxonomies() ?? ['none'],
 			'templateName' => get_page_template_slug() ?: 'default',
 			'requiresPassword' => $this->hasPassword(),
+			'postId' => $this->getPostId()
 		];
 
 		// If we are in developer mode we want to see what the current page is setting.
@@ -129,6 +143,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
 			header('Meta-cc-requires-password: ' . ($this->pageProperties['requiresPassword'] ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
+			header('Meta-cc-post-id: '. $this->pageProperties['postId']);
 		}
 	}
 
@@ -152,6 +167,25 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			'maxAge' => 'default',
 			'overridesTaxonomy' => false,
 		];
+
+		// Check if we have an individual cache configured for this page and return this value if we do
+		if (have_rows('field_cache_control_individual_post_settings', 'options')) {
+			$rows = get_field('field_cache_control_individual_post_settings', 'options');
+			foreach ($rows as $row) {
+				if ($this->pageProperties['postId'] == $row['cache_control_individual_post_post_id']) {
+					$this->maxAge = $row['cache_control_individual_post_cache_age'];
+					if ($this->developerMode) {
+						header('Meta-cc-config-individual-post-max-age: ' . $this->maxAge);
+						header('Meta-cc-individual-page-cache-setting-triggered: Yes');
+						header('Meta-cc-configured-max-age: ' . $this->maxAge);
+					}
+					return;
+				}
+			}
+		}
+		if ($this->developerMode) {
+			header('Meta-cc-individual-page-cache-setting-triggered: No');
+		}
 
 		// Get post type options.
 		if (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
