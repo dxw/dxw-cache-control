@@ -1,5 +1,7 @@
 <?php
 
+use Kahlan\Plugin\Double;
+
 describe(\CacheControl\SendHeaders::class, function () {
 	beforeEach(function () {
 		$this->sendHeaders = new \CacheControl\SendHeaders();
@@ -14,6 +16,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 		allow('get_page_template_slug')->toBeCalled()->andReturn('default');
 		allow('get_post_types')->toBeCalled()->andReturn(['post', 'page', 'custom-post']);
 		allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
+		allow('get_post')->toBeCalled()->andReturn(null);
 
 		$this->config = [
 			'cache_control_plugin_developer_mode' => false,
@@ -51,7 +54,8 @@ describe(\CacheControl\SendHeaders::class, function () {
 			'cache_control_template_custom-post_settings' => [
 				'cache_control_template_page-custom_cache_age' => 'default',
 				'cache_control_template_page-custom_override_taxonomy' => false,
-			]
+			],
+			'field_cache_control_individual_post_settings' => []
 		];
 
 		$this->headers = [
@@ -76,7 +80,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 		allow('have_rows')->toBeCalled()->andRun(function (string $key, string $string) {
 			if ($this->row == '' || $this->row != $key) {
-				if (array_key_exists($key, $this->config)) {
+				if (array_key_exists($key, $this->config) && count($this->config[$key])) {
 					$this->key = $key;
 					$this->currentSubConfig = $this->config[$key];
 
@@ -212,7 +216,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(16);
+				expect('header')->toBeCalled()->times(17);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -223,7 +227,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(16);
+				expect('header')->toBeCalled()->times(17);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -253,7 +257,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(25);
+				expect('header')->toBeCalled()->times(27);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -541,7 +545,6 @@ describe(\CacheControl\SendHeaders::class, function () {
 				$this->sendHeaders->setCacheHeader();
 			});
 
-
 			context('config values are incorrectly set', function () {
 				it('config values are unset (return null)', function () {
 					$this->config['cache_control_plugin_archives_cache'] = null;
@@ -668,6 +671,48 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 					$this->sendHeaders->setCacheHeader();
 				});
+			});
+		});
+
+		context('individual post tests', function () {
+			beforeEach(function () {
+				$this->postObj = Double::instance([
+					'class' => 'WP_Post',
+				]);
+				$this->postObj->ID = 2;
+
+				$this->config['field_cache_control_individual_post_settings'] = [
+					[
+						'cache_control_individual_post_post_id' => 2,
+						'cache_control_individual_post_cache_age' => '120'
+					]
+				];
+			});
+
+			it('current page has no post ID', function () {
+				allow('get_post')->toBeCalled()->andReturn(null);
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('current page has post ID, and a cache override is configured', function () {
+				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=120, public');
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('current page has post ID, but not one configured with a cache override', function () {
+				$this->postObj->ID = 3;
+
+				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+				$this->sendHeaders->setCacheHeader();
 			});
 		});
 
