@@ -705,6 +705,34 @@ describe(\CacheControl\SendHeaders::class, function () {
 				$this->sendHeaders->setCacheHeader();
 			});
 
+			it('current page has post ID, and a cache override is configured as "default"', function () {
+				$this->config['field_cache_control_individual_post_settings'] = [
+					[
+						'cache_control_individual_post_post_id' => 2,
+						'cache_control_individual_post_cache_age' => 'default'
+					]
+				];
+				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
+			it('current page has post ID, and a cache override is configured for id " "', function () {
+				$this->config['field_cache_control_individual_post_settings'] = [
+					[
+						'cache_control_individual_post_post_id' => '',
+						'cache_control_individual_post_cache_age' => 120
+					]
+				];
+				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
 			it('current page has post ID, but not one configured with a cache override', function () {
 				$this->postObj->ID = 3;
 
