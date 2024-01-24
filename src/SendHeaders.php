@@ -172,8 +172,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if (have_rows('field_cache_control_individual_post_settings', 'options')) {
 			$rows = get_field('field_cache_control_individual_post_settings', 'options');
 			foreach ($rows as $row) {
-				if ($this->pageProperties['postId'] == $row['cache_control_individual_post_post_id']) {
-					$this->maxAge = $row['cache_control_individual_post_cache_age'];
+				if (!empty($row['cache_control_individual_post_post_id']) && $this->pageProperties['postId'] == $row['cache_control_individual_post_post_id']) {
+					if ($row['cache_control_individual_post_cache_age'] != 'default') {
+						$this->maxAge = $row['cache_control_individual_post_cache_age'];
+					}
+
 					if ($this->developerMode) {
 						header('Meta-cc-config-individual-post-max-age: ' . $this->maxAge);
 						header('Meta-cc-individual-page-cache-setting-triggered: Yes');
