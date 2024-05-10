@@ -34,6 +34,7 @@ class Options implements \Dxw\Iguana\Registerable
 		$ageOptions = [
 			'default'   => 'Default',
 			120 		=> '2 mins',
+			300 		=> '5 mins',
 			900 		=> '15 mins',
 			1800 		=> '30 mins',
 			3600		=> '1 hr',
