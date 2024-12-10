@@ -6,6 +6,8 @@ custom max-age value which is administrator controlled in the backend.
 The plugin only modifies the headers on the frontend of the site, and does not opperate at all in the administration 
 pages of a wordpress site.
 
+NOTE: Version 1.0.0 onwards only supports PHP 8.2 and up.
+
 ## What this plugin does
 
 1. Adds a Cache Control page to the site settings, which allows values for the max-age of the cache to be configured by post type, taxonomy and template.
