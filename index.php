@@ -9,7 +9,7 @@
  * @license     MIT
  *
  * @wordpress-plugin
- * Plugin Name: DXW Cache Control
+ * Plugin Name: dxw Cache Control
  * Plugin URI: https://github.com/dxw/dxw-cache-control
  * Description: Set the Cache control headers by content type, taxonomy, template etc.
  * Author: dxw
