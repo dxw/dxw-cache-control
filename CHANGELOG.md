@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Settings link appears in plugins page
+
 ### Fixed
 - Lowercased company name in plugin metadata
 

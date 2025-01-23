@@ -10,6 +10,30 @@ describe(\CacheControl\Options::class, function () {
 		expect($this->options)->toBeAnInstanceOf(\Dxw\Iguana\Registerable::class);
 	});
 
+	describe('->register()', function () {
+		it('adds actions and filters', function () {
+			allow('add_action')->toBeCalled();
+			expect('add_action')->toBeCalled()->times(2);
+			expect('add_action')->toBeCalled()->with('acf/init', [$this->options, 'addOptionsPage']);
+			expect('add_action')->toBeCalled()->with('init', [$this->options, 'addOptions'], 999);
+			allow('add_filter')->toBeCalled();
+			expect('add_filter')->toBeCalled()->with('plugin_action_links_dxw-cache-control/index.php', [$this->options, 'addActionLinks']);
+
+			$this->options->register();
+		});
+	});
+
+	describe('->addActionLinks()', function () {
+		it('adds a link to the settings page', function () {
+			allow('admin_url')->toBeCalled()->with('options-general.php?page=cache-control-settings')->andReturn('https://example.com/wp-admin/options-general.php?page=cache-control-settings');
+
+			$expected = ['<a href="https://example.com/wp-admin/options-general.php?page=cache-control-settings">Settings</a>'];
+			$result = $this->options->addActionLinks([]);
+
+			expect($result)->toEqual($expected);
+		});
+	});
+
 	describe('->addOptionsPage()', function () {
 		context('ACF is not activated', function () {
 			it('does nothing', function () {

@@ -11,6 +11,14 @@ class Options implements \Dxw\Iguana\Registerable
 	{
 		add_action('acf/init', [$this, 'addOptionsPage']);
 		add_action('init', [$this, 'addOptions'], 999);
+		add_filter('plugin_action_links_dxw-cache-control/index.php', [$this, 'addActionLinks']);
+	}
+
+	public function addActionLinks(array $links): array
+	{
+		$settingsLink = '<a href="' . admin_url('options-general.php?page=cache-control-settings') . '">Settings</a>';
+		array_push($links, $settingsLink);
+		return $links;
 	}
 
 	public function addOptionsPage(): void
