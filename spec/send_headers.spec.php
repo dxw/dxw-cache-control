@@ -11,6 +11,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 		allow('is_front_page')->toBeCalled()->andReturn(false);
 		allow('is_home')->toBeCalled()->andReturn(false);
 		allow('is_user_logged_in')->toBeCalled()->andReturn(false);
+		allow('is_preview')->toBeCalled()->andReturn(false);
 		allow('get_post_type')->toBeCalled()->andReturn('post');
 		allow('get_post_taxonomies')->toBeCalled()->andReturn(['category', 'post_tag', 'custom-taxonomy']);
 		allow('get_page_template_slug')->toBeCalled()->andReturn('default');
@@ -148,6 +149,16 @@ describe(\CacheControl\SendHeaders::class, function () {
 				allow('is_user_logged_in')->toBeCalled()->andReturn(true);
 			});
 
+			it('sets a private cache header for preview pages', function () {
+				allow('is_preview')->toBeCalled()->andReturn(true);
+				expect('get_field')->toBeCalled()->once();
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
 			it('is not in developer mode', function () {
 				expect('get_field')->toBeCalled()->once();
 
@@ -174,6 +185,18 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->getContext($this->headers['cache']);
+				$this->sendHeaders->setCacheHeader();
+			});
+		});
+
+		context('the user is not logged in', function () {
+			it('sets a private cache header for preview pages', function () {
+				allow('is_preview')->toBeCalled()->andReturn(true);
+				expect('get_field')->toBeCalled()->once();
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
+
 				$this->sendHeaders->setCacheHeader();
 			});
 		});
