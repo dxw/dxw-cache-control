@@ -30,7 +30,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	public function setCacheHeader(): void
 	{
-		if (wp_get_environment_type() != 'production') {
+		if (wp_get_environment_type() === 'local' || wp_get_environment_type() === 'development') {
 			$this->developerMode = get_field('cache_control_plugin_developer_mode', 'option') ?? false;
 		}
 

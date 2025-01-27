@@ -56,7 +56,7 @@ class Options implements \Dxw\Iguana\Registerable
 		if (function_exists('acf_add_local_field_group')):
 
 			$developer_mode = [];
-			if (wp_get_environment_type() != 'production') {
+			if (wp_get_environment_type() === 'local' || wp_get_environment_type() === 'development') {
 				$developer_mode = [
 					'key' => 'field_cache_control_plugin_settings-developer_mode',
 					'label' => 'Developer mode',

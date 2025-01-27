@@ -11,7 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Lowercased company name in plugin metadata
-- Bug where preview pages had public cache headers set
+- Bug where preview pages had public cache headers set and potentially other pages in developer mode
+
+### Changed
+- Developer mode is only available in 'local' and 'development' environment types
 
 ## [v1.0.0] - 2024-12-10
 

@@ -233,6 +233,17 @@ describe(\CacheControl\SendHeaders::class, function () {
 				$this->sendHeaders->setCacheHeader();
 			});
 
+			it('is on the local environment', function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
+				expect('get_post_types')->toBeCalled()->once();
+				expect('get_field')->toBeCalled()->times(3);
+
+				allow('header')->toBeCalled();
+				expect('header')->toBeCalled()->times(17);
+
+				$this->sendHeaders->setCacheHeader();
+			});
+
 			it('is on the development environment', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('development');
 				expect('get_post_types')->toBeCalled()->once();
@@ -246,11 +257,9 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			it('is on the staging environment', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('staging');
-				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(3);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(17);
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->setCacheHeader();
 			});
