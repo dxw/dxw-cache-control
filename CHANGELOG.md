@@ -47,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix namespacing in composer.json
 - Fix fatal error caused by passing a string where int expected
-- Fix a bug in the taxonomy processing 
+- Fix a bug in the taxonomy processing
 - Fix bug in template config logic
 
 ## [0.1.0] - 2022-10-20
