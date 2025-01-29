@@ -210,7 +210,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			it('is in developer mode on the local dev environment', function () {
 				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(3);
+				expect('get_field')->toBeCalled()->times(1);
 
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Meta-cc-post-type: post');
@@ -223,12 +223,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('header')->toBeCalled()->once()->with('Meta-cc-template_name: default');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-requires-password: no');
 				expect('header')->toBeCalled()->once()->with('Meta-cc-post-types: post,page,custom-post');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-front-page-cache-value: default');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-configured-max-age: 86400');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-configured-cache: no-cache (logged in user)');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-currently-used-config: default');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-final-configured-max-age: 86400');
-				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -236,10 +231,10 @@ describe(\CacheControl\SendHeaders::class, function () {
 			it('is on the local environment', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
 				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(3);
+				expect('get_field')->toBeCalled()->times(1);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(17);
+				expect('header')->toBeCalled()->times(12);
 
 				$this->sendHeaders->setCacheHeader();
 			});
@@ -247,17 +242,16 @@ describe(\CacheControl\SendHeaders::class, function () {
 			it('is on the development environment', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('development');
 				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(3);
+				expect('get_field')->toBeCalled()->times(1);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(17);
+				expect('header')->toBeCalled()->times(12);
 
 				$this->sendHeaders->setCacheHeader();
 			});
 
 			it('is on the staging environment', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('staging');
-
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
@@ -286,10 +280,10 @@ describe(\CacheControl\SendHeaders::class, function () {
 				allow('get_page_template_slug')->toBeCalled()->andReturn('custom-template.php');
 
 				expect('get_post_types')->toBeCalled()->once();
-				expect('get_field')->toBeCalled()->times(3);
+				expect('get_field')->toBeCalled()->times(1);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->times(27);
+				expect('header')->toBeCalled()->times(12);
 
 				$this->sendHeaders->setCacheHeader();
 			});

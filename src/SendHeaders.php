@@ -39,10 +39,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		if (count($this->pageProperties)) {
 			// if we are logged in, or on the front page we don't need to worry about configuring things further
-			if (
-				($this->pageProperties['isLoggedInUser'] || $this->pageProperties['requiresPassword'] || $this->pageProperties['isPreviewPage'])
-				&& !$this->developerMode
-			) {
+			if ($this->pageProperties['isLoggedInUser'] || $this->pageProperties['requiresPassword'] || $this->pageProperties['isPreviewPage']) {
 				header('Cache-Control: no-cache, no-store, private');
 				return;
 			}
@@ -51,6 +48,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			 * If something is setting no-cache using the wp_headers filter
 			 * we don't want to mess with that
 			 */
+			/** @psalm-suppress RedundantCondition */
 			if (
 				!$this->pageProperties['isLoggedInUser']
 				&& array_key_exists('Cache-Control', $this->headers)
@@ -75,9 +73,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				$this->getPageConfiguration();
 			}
 
+			/** @psalm-suppress TypeDoesNotContainType */
 			if ($this->pageProperties['isLoggedInUser']) {
 				header('Meta-cc-configured-cache: no-cache (logged in user)');
 			}
+			/** @psalm-suppress TypeDoesNotContainType */
 			if ($this->pageProperties['requiresPassword']) {
 				header('Meta-cc-configured-cache: no-cache (requires password)');
 			}
