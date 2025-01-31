@@ -6,6 +6,8 @@ describe(\CacheControl\SendHeaders::class, function () {
 	beforeEach(function () {
 		$this->sendHeaders = new \CacheControl\SendHeaders();
 
+		global $post;
+		$post = (object) [];
 		allow('is_admin')->toBeCalled()->andReturn(false);
 		allow('is_post_type_archive')->toBeCalled()->andReturn(false);
 		allow('is_front_page')->toBeCalled()->andReturn(false);
