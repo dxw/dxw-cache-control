@@ -41,10 +41,7 @@ class Page
 
 	public function taxonomies(): array
 	{
-		// Note: this implementation is actually buggy
-		// get_post_taxonomies will never return null, only an empty array
-		// Spotted in a refactor, will be fixed in a separate commit
-		return get_post_taxonomies() ?? ['none'];
+		return get_post_taxonomies() ?: ['none'];
 	}
 
 	public function templateName(): string

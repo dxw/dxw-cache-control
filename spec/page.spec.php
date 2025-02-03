@@ -77,7 +77,7 @@ describe(\CacheControl\Page::class, function () {
 		});
 		context('post has no taxonomies', function () {
 			it('returns [\'none\']', function () {
-				allow('get_post_taxonomies')->toBeCalled()->andReturn(null);
+				allow('get_post_taxonomies')->toBeCalled()->andReturn([]);
 				expect($this->page->taxonomies())->toEqual(['none']);
 			});
 		});
