@@ -39,8 +39,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			$this->developerMode = get_field('cache_control_plugin_developer_mode', 'option') ?? false;
 		}
 
-		//Get our page properties that we will be using to figure out our cache settings,
-		$this->getPageProperties();
+		$this->outputDeveloperMeta();
 
 		// if we are logged in, or on the front page we don't need to worry about configuring things further
 		if ($this->page->isLoggedInUser() || $this->page->requiresPassword() || $this->page->isPreviewPage()) {
@@ -94,13 +93,14 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	}
 
 	/**
-	 * getPageProperties
+	 * outputDeveloperMeta
 	 *
-	 * Populate our page properties for the page we are on, set $this->pageValues.
+	 * Output additional info headers
+	 * If in developer mode
 	 *
 	 * @return void
 	 */
-	protected function getPageProperties(): void
+	protected function outputDeveloperMeta(): void
 	{
 		// If we are in developer mode we want to see what the current page is setting.
 		if ($this->developerMode) {
