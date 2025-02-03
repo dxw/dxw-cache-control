@@ -36,10 +36,7 @@ class Page
 
 	public function postType(): string
 	{
-		// Note: this implementation is actually buggy
-		// get_post_type will never return null, only false
-		// Spotted in a refactor, will be fixed in a separate commit
-		return get_post_type() ?? 'unknown';
+		return get_post_type() ?: 'unknown';
 	}
 
 	public function taxonomies(): array

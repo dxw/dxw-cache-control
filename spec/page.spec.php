@@ -62,7 +62,7 @@ describe(\CacheControl\Page::class, function () {
 		});
 		context('post type is not known', function () {
 			it('returns \'unknown\'', function () {
-				allow('get_post_type')->toBeCalled()->andReturn(null);
+				allow('get_post_type')->toBeCalled()->andReturn(false);
 				expect($this->page->postType())->toEqual('unknown');
 			});
 		});
