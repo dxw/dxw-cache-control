@@ -4,7 +4,10 @@ use Kahlan\Plugin\Double;
 
 describe(\CacheControl\SendHeaders::class, function () {
 	beforeEach(function () {
-		$this->sendHeaders = new \CacheControl\SendHeaders();
+		$this->page = \Kahlan\Plugin\Double::instance([
+			'extends' => \CacheControl\Page::class
+		]);
+		$this->sendHeaders = new \CacheControl\SendHeaders($this->page);
 
 		global $post;
 		$post = (object) [];
@@ -821,7 +824,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('is a password protected page', function () {
-					allow($this->sendHeaders)->toReceive('hasPassword')->andReturn(true);
+					allow($this->page)->toReceive('requiresPassword')->andReturn(true);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
