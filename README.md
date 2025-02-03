@@ -3,7 +3,7 @@
 This plugin adds the ability to set the cache-control header for any wordpress page displayed in the frontend to a 
 custom max-age value which is administrator controlled in the backend.
 
-The plugin only modifies the headers on the frontend of the site, and does not opperate at all in the administration 
+The plugin only modifies the headers on the frontend of the site, and does not operate at all in the administration
 pages of a wordpress site.
 
 NOTE: Version 1.0.0 onwards only supports PHP 8.2 and up.
@@ -41,7 +41,7 @@ This config section is only displayed if there are custom templates available, o
 Where this section is available each template config will state which post type this will affect.
 
 - $template_name cache: sets the max-age value for the template.
-- Overrides taxonomy cache age: sets wthere this template setting can override a configured taxonomy cache config, only applies to posts, taxonomy cache setting is always preferred on archive pages.
+- Overrides taxonomy cache age: sets where this template setting can override a configured taxonomy cache config, only applies to posts, taxonomy cache setting is always preferred on archive pages.
 
 ## Priority of configuration directives
 
