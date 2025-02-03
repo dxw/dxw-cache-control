@@ -11,6 +11,14 @@ class Options implements \Dxw\Iguana\Registerable
 	{
 		add_action('acf/init', [$this, 'addOptionsPage']);
 		add_action('init', [$this, 'addOptions'], 999);
+		add_filter('plugin_action_links_dxw-cache-control/index.php', [$this, 'addActionLinks']);
+	}
+
+	public function addActionLinks(array $links): array
+	{
+		$settingsLink = '<a href="' . admin_url('options-general.php?page=cache-control-settings') . '">Settings</a>';
+		array_push($links, $settingsLink);
+		return $links;
 	}
 
 	public function addOptionsPage(): void
@@ -48,7 +56,7 @@ class Options implements \Dxw\Iguana\Registerable
 		if (function_exists('acf_add_local_field_group')):
 
 			$developer_mode = [];
-			if (wp_get_environment_type() != 'production') {
+			if (wp_get_environment_type() === 'local' || wp_get_environment_type() === 'development') {
 				$developer_mode = [
 					'key' => 'field_cache_control_plugin_settings-developer_mode',
 					'label' => 'Developer mode',

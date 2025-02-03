@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Settings link appears in plugins page
+
+### Fixed
+- Lowercased company name in plugin metadata
+- Bug where preview pages had public cache headers set and potentially other pages in developer mode
+
+### Changed
+- Developer mode is only available in 'local' and 'development' environment types
+
 ## [v1.0.0] - 2024-12-10
 
 ### Removed
@@ -47,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix namespacing in composer.json
 - Fix fatal error caused by passing a string where int expected
-- Fix a bug in the taxonomy processing 
+- Fix a bug in the taxonomy processing
 - Fix bug in template config logic
 
 ## [0.1.0] - 2022-10-20

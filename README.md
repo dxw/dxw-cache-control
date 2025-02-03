@@ -3,7 +3,7 @@
 This plugin adds the ability to set the cache-control header for any wordpress page displayed in the frontend to a 
 custom max-age value which is administrator controlled in the backend.
 
-The plugin only modifies the headers on the frontend of the site, and does not opperate at all in the administration 
+The plugin only modifies the headers on the frontend of the site, and does not operate at all in the administration
 pages of a wordpress site.
 
 NOTE: Version 1.0.0 onwards only supports PHP 8.2 and up.
@@ -19,7 +19,7 @@ The default cache max-age is set to 24 hours, other than the front page config, 
 The front page config is always respected, regardless of other configuration, even if it is set to the default value.
 
 ### Global options
-- Developer mode flag: Disables the Logged In User override (not available production), outputs various headers with the prefix 'Meta-cc' that provide information on page properties and config state.
+- Developer mode flag: Disables the Logged In User override (only available in `local` or `development` WordPress environments), outputs various headers with the prefix 'Meta-cc' that provide information on page properties and config state.
 - Front Page Cache: Sets the max-age for the configured front page of the site.
 - Home Page Cache: Sets the max-age for the configured home page of the site (see [Wordpress function reference: is_home()](https://developer.wordpress.org/reference/functions/is_home/)) for details.
 - Archive Cache: Sets the max-age value for archive pages.
@@ -41,7 +41,7 @@ This config section is only displayed if there are custom templates available, o
 Where this section is available each template config will state which post type this will affect.
 
 - $template_name cache: sets the max-age value for the template.
-- Overrides taxonomy cache age: sets wthere this template setting can override a configured taxonomy cache config, only applies to posts, taxonomy cache setting is always preferred on archive pages.
+- Overrides taxonomy cache age: sets where this template setting can override a configured taxonomy cache config, only applies to posts, taxonomy cache setting is always preferred on archive pages.
 
 ## Priority of configuration directives
 
