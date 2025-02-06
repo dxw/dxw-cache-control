@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Developer mode is only available in 'local' and 'development' environment types
+- Meta-cc prefixed http headers, which are used for debugging, now prefixed with X-Debug-dxw-Cache-Control
 
 ## [v1.0.0] - 2024-12-10
 
