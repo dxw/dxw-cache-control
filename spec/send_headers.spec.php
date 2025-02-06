@@ -218,16 +218,16 @@ describe(\CacheControl\SendHeaders::class, function () {
 				expect('get_field')->toBeCalled()->times(1);
 
 				allow('header')->toBeCalled();
-				expect('header')->toBeCalled()->once()->with('Meta-cc-post-type: post');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-taxonomy:category,post_tag,custom-taxonomy');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-front-page: yes');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-home-page: no');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-archive: no');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-is-admin: no');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-logged-in-user: yes');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-template_name: default');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-requires-password: no');
-				expect('header')->toBeCalled()->once()->with('Meta-cc-post-types: post,page,custom-post');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-type: post');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy:category,post_tag,custom-taxonomy');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page: yes');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-home-page: no');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-archive: no');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-is-admin: no');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-logged-in-user: yes');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-template_name: default');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-requires-password: no');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-types: post,page,custom-post');
 				expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
 
 				$this->sendHeaders->setCacheHeader();
@@ -341,20 +341,20 @@ describe(\CacheControl\SendHeaders::class, function () {
 					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
-					expect('header')->toBeCalled()->once()->with('Meta-cc-post-type: post');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-taxonomy:category,post_tag,custom-taxonomy');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-front-page: yes');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-home-page: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-archive: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-is-admin: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-logged-in-user: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-template_name: default');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-requires-password: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-post-types: post,page,custom-post');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-front-page-cache-value: default');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-configured-max-age: 86400');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-currently-used-config: default');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-final-configured-max-age: 86400');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-type: post');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy:category,post_tag,custom-taxonomy');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page: yes');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-home-page: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-archive: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-is-admin: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-logged-in-user: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-template_name: default');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-requires-password: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-types: post,page,custom-post');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page-cache-value: default');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-configured-max-age: 86400');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-currently-used-config: default');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-final-configured-max-age: 86400');
 					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
 
 					$this->sendHeaders->setCacheHeader();
@@ -383,20 +383,20 @@ describe(\CacheControl\SendHeaders::class, function () {
 					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
-					expect('header')->toBeCalled()->once()->with('Meta-cc-post-type: post');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-taxonomy:category,post_tag,custom-taxonomy');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-front-page: yes');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-home-page: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-archive: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-is-admin: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-logged-in-user: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-template_name: default');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-requires-password: no');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-post-types: post,page,custom-post');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-front-page-cache-value: 3600');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-configured-max-age: 3600');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-currently-used-config: frontPage');
-					expect('header')->toBeCalled()->once()->with('Meta-cc-final-configured-max-age: 3600');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-type: post');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy:category,post_tag,custom-taxonomy');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page: yes');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-home-page: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-archive: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-is-admin: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-logged-in-user: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-template_name: default');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-requires-password: no');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-types: post,page,custom-post');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page-cache-value: 3600');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-configured-max-age: 3600');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-currently-used-config: frontPage');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-final-configured-max-age: 3600');
 					expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=3600, public');
 
 					$this->sendHeaders->setCacheHeader();
