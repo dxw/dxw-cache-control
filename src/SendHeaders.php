@@ -9,11 +9,16 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected bool $developerMode = false;
 	protected bool $overriddenByTaxonomy = false;
 	protected string $currentConfig = 'default';
-	protected array $pageProperties = [];
+	protected object $page;
 	protected string $homePageCacheAge = 'default';
 	protected string $frontPageCacheAge = 'default';
 	protected string $archiveCacheAge = 'default';
 	protected array $headers = [];
+
+	public function __construct(\CacheControl\Page $page)
+	{
+		$this->page = $page;
+	}
 
 	public function register(): void
 	{
@@ -34,117 +39,82 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			$this->developerMode = get_field('cache_control_plugin_developer_mode', 'option') ?? false;
 		}
 
-		//Get our page properties that we will be using to figure out our cache settings,
-		$this->getPageProperties();
+		$this->outputDeveloperMeta();
 
-		if (count($this->pageProperties)) {
-			// if we are logged in, or on the front page we don't need to worry about configuring things further
-			if ($this->pageProperties['isLoggedInUser'] || $this->pageProperties['requiresPassword'] || $this->pageProperties['isPreviewPage']) {
-				header('Cache-Control: no-cache, no-store, private');
-				return;
-			}
+		// if we are logged in, or on the front page we don't need to worry about configuring things further
+		if ($this->page->isLoggedInUser() || $this->page->requiresPassword() || $this->page->isPreviewPage()) {
+			header('Cache-Control: no-cache, no-store, private');
+			return;
+		}
 
-			/*
-			 * If something is setting no-cache using the wp_headers filter
-			 * we don't want to mess with that
-			 */
-			/** @psalm-suppress RedundantCondition */
-			if (
-				!$this->pageProperties['isLoggedInUser']
-				&& array_key_exists('Cache-Control', $this->headers)
-				&& preg_match('/no-cache/', $this->headers['Cache-Control'])
-			) {
-				return;
-			}
+		/*
+			* If something is setting no-cache using the wp_headers filter
+			* we don't want to mess with that
+			*/
+		/** @psalm-suppress RedundantCondition */
+		if (
+			!$this->page->isLoggedInUser()
+			&& array_key_exists('Cache-Control', $this->headers)
+			&& preg_match('/no-cache/', $this->headers['Cache-Control'])
+		) {
+			return;
+		}
 
-			if ($this->pageProperties['isFrontPage']) {
-				if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
-					$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
-				}
-				if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
-					$this->currentConfig = 'frontPage';
-					$this->maxAge = (int) $this->frontPageCacheAge;
-				}
-				if ($this->developerMode) {
-					header('Meta-cc-front-page-cache-value: ' . $this->frontPageCacheAge);
-					header('Meta-cc-configured-max-age: ' . $this->maxAge);
-				}
-			} else {
-				$this->getPageConfiguration();
+		if ($this->page->isFrontPage()) {
+			if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
+				$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
 			}
-
-			/** @psalm-suppress TypeDoesNotContainType */
-			if ($this->pageProperties['isLoggedInUser']) {
-				header('Meta-cc-configured-cache: no-cache (logged in user)');
-			}
-			/** @psalm-suppress TypeDoesNotContainType */
-			if ($this->pageProperties['requiresPassword']) {
-				header('Meta-cc-configured-cache: no-cache (requires password)');
+			if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
+				$this->currentConfig = 'frontPage';
+				$this->maxAge = (int) $this->frontPageCacheAge;
 			}
 			if ($this->developerMode) {
-				header('Meta-cc-currently-used-config: ' . $this->currentConfig);
-				header('Meta-cc-final-configured-max-age: ' . $this->maxAge);
+				header('Meta-cc-front-page-cache-value: ' . $this->frontPageCacheAge);
+				header('Meta-cc-configured-max-age: ' . $this->maxAge);
 			}
+		} else {
+			$this->getPageConfiguration();
 		}
+
+		/** @psalm-suppress TypeDoesNotContainType */
+		if ($this->page->isLoggedInUser()) {
+			header('Meta-cc-configured-cache: no-cache (logged in user)');
+		}
+		/** @psalm-suppress TypeDoesNotContainType */
+		if ($this->page->requiresPassword()) {
+			header('Meta-cc-configured-cache: no-cache (requires password)');
+		}
+		if ($this->developerMode) {
+			header('Meta-cc-currently-used-config: ' . $this->currentConfig);
+			header('Meta-cc-final-configured-max-age: ' . $this->maxAge);
+		}
+
 		header('Cache-Control: max-age=' . $this->maxAge .', public');
 	}
 
-	protected function hasPassword(): bool
-	{
-		global $post;
-
-		return !empty($post->post_password);
-	}
-
 	/**
-	 * @psalm-suppress ArgumentTypeCoercion
-	 */
-	protected function getPostId(): int
-	{
-		$post = get_post();
-
-		if (is_a($post, 'WP_Post')) {
-			return $post->ID;
-		}
-		return 0;
-	}
-
-	/**
-	 * getPageProperties
+	 * outputDeveloperMeta
 	 *
-	 * Populate our page properties for the page we are on, set $this->pageValues.
+	 * Output additional info headers
+	 * If in developer mode
 	 *
 	 * @return void
 	 */
-	protected function getPageProperties(): void
+	protected function outputDeveloperMeta(): void
 	{
-		$this->pageProperties = [
-			'isAdmin' => is_admin(),
-			'isArchivePage' => is_post_type_archive(),
-			'isFrontPage' => is_front_page(),
-			'isHomePage' => is_home(),
-			'isLoggedInUser' => is_user_logged_in(),
-			'isPreviewPage' => is_preview(),
-			'postType' => get_post_type() ?? 'unknown',
-			'taxonomies' => get_post_taxonomies() ?? ['none'],
-			'templateName' => get_page_template_slug() ?: 'default',
-			'requiresPassword' => $this->hasPassword(),
-			'postId' => $this->getPostId()
-		];
-
 		// If we are in developer mode we want to see what the current page is setting.
 		if ($this->developerMode) {
-			header('Meta-cc-post-type: ' . $this->pageProperties['postType']);
-			header('Meta-cc-taxonomy:' . implode(',', $this->pageProperties['taxonomies']));
-			header('Meta-cc-front-page: ' . ($this->pageProperties['isFrontPage'] ? 'yes' : 'no'));
-			header('Meta-cc-home-page: ' . ($this->pageProperties['isHomePage'] ? 'yes' : 'no'));
-			header('Meta-cc-archive: ' . ($this->pageProperties['isArchivePage'] ? 'yes' : 'no'));
-			header('Meta-cc-is-admin: ' . ($this->pageProperties['isAdmin'] ? 'yes' : 'no'));
-			header('Meta-cc-logged-in-user: ' . ($this->pageProperties['isLoggedInUser'] ? 'yes' : 'no'));
-			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
-			header('Meta-cc-requires-password: ' . ($this->pageProperties['requiresPassword'] ? 'yes' : 'no'));
+			header('Meta-cc-post-type: ' . $this->page->postType());
+			header('Meta-cc-taxonomy:' . implode(',', $this->page->taxonomies()));
+			header('Meta-cc-front-page: ' . ($this->page->isFrontPage() ? 'yes' : 'no'));
+			header('Meta-cc-home-page: ' . ($this->page->isHomePage() ? 'yes' : 'no'));
+			header('Meta-cc-archive: ' . ($this->page->isArchivePage() ? 'yes' : 'no'));
+			header('Meta-cc-is-admin: ' . ($this->page->isAdmin() ? 'yes' : 'no'));
+			header('Meta-cc-logged-in-user: ' . ($this->page->isLoggedInUser() ? 'yes' : 'no'));
+			header('Meta-cc-template_name: ' . $this->page->templateName());
+			header('Meta-cc-requires-password: ' . ($this->page->requiresPassword() ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
-			header('Meta-cc-post-id: '. $this->pageProperties['postId']);
+			header('Meta-cc-post-id: '. $this->page->postId());
 		}
 	}
 
@@ -173,7 +143,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if (have_rows('field_cache_control_individual_post_settings', 'options')) {
 			$rows = get_field('field_cache_control_individual_post_settings', 'options');
 			foreach ($rows as $row) {
-				if (!empty($row['cache_control_individual_post_post_id']) && $this->pageProperties['postId'] == $row['cache_control_individual_post_post_id']) {
+				if (!empty($row['cache_control_individual_post_post_id']) && $this->page->postId() == $row['cache_control_individual_post_post_id']) {
 					if ($row['cache_control_individual_post_cache_age'] != 'default') {
 						$this->maxAge = $row['cache_control_individual_post_cache_age'];
 					}
@@ -192,18 +162,18 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 
 		// Get post type options.
-		if (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
-			while (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
+		if (have_rows('cache_control_post_type_' . $this->page->postType() . '_settings', 'option')) {
+			while (have_rows('cache_control_post_type_' . $this->page->postType() . '_settings', 'option')) {
 				the_row();
-				$postTypeConfig['maxAge'] = get_sub_field('cache_control_post_type_' . $this->pageProperties['postType'] . '_cache_age');
-				if ($this->pageProperties['postType'] != 'page') {
-					$postTypeConfig['overridesArchive'] = get_sub_field('cache_control_post_type_' . $this->pageProperties['postType'] . '_override_archive');
+				$postTypeConfig['maxAge'] = get_sub_field('cache_control_post_type_' . $this->page->postType() . '_cache_age');
+				if ($this->page->postType() != 'page') {
+					$postTypeConfig['overridesArchive'] = get_sub_field('cache_control_post_type_' . $this->page->postType() . '_override_archive');
 				}
 				$postTypeConfig['overriddenByTaxonomy'] = get_sub_field(
-					'cache_control_post_type_' . $this->pageProperties['postType'] . '_overridden_by_taxonomy'
+					'cache_control_post_type_' . $this->page->postType() . '_overridden_by_taxonomy'
 				) ?: false;
 				$postTypeConfig['overriddenByTemplate'] = get_sub_field(
-					'cache_control_post_type_' . $this->pageProperties['postType'] . '_overridden_by_template'
+					'cache_control_post_type_' . $this->page->postType() . '_overridden_by_template'
 				) ?: false;
 
 				// Only set these values if the maxAge is set to a value other than default.
@@ -223,8 +193,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 
 		// Get taxonomy options.
-		if (count($this->pageProperties['taxonomies']) > 0 && !in_array('none', $this->pageProperties['taxonomies'])) {
-			foreach ($this->pageProperties['taxonomies'] as $taxonomy) {
+		if (count($this->page->taxonomies()) > 0 && !in_array('none', $this->page->taxonomies())) {
+			foreach ($this->page->taxonomies() as $taxonomy) {
 				if (have_rows('cache_control_taxonomy_' . $taxonomy . '_settings', 'option')) {
 					while (have_rows('cache_control_taxonomy_' . $taxonomy . '_settings', 'option')) {
 						the_row();
@@ -250,8 +220,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 
 		// Get template options.
-		if ($this->pageProperties['templateName'] != 'default') {
-			$localTemplateFile = preg_replace('/\.php$/', '', $this->pageProperties['templateName']);
+		if ($this->page->templateName() != 'default') {
+			$localTemplateFile = preg_replace('/\.php$/', '', $this->page->templateName());
 			if ($this->developerMode) {
 				header('Meta-cc-config-template-local-name: ' . $localTemplateFile);
 			}
@@ -279,7 +249,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-config-taxonomy-priority: ' . ($templateConfig['overridesTaxonomy'] ? 'yes' : 'no'));
 		}
 
-		if ($this->pageProperties['isArchivePage']) {
+		if ($this->page->isArchivePage()) {
 			// Do we have a configured taxonomy cache age?
 			if ($taxonomyConfig['maxAge'] != 'default') {
 				$this->currentConfig = 'taxonomy';
@@ -301,7 +271,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			}
 		}
 
-		if ($this->pageProperties['isHomePage']) {
+		if ($this->page->isHomePage()) {
 			if (is_string(get_field('cache_control_plugin_home_page_cache', 'option'))) {
 				$this->homePageCacheAge = get_field('cache_control_plugin_home_page_cache', 'option');
 			}

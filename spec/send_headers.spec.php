@@ -4,20 +4,25 @@ use Kahlan\Plugin\Double;
 
 describe(\CacheControl\SendHeaders::class, function () {
 	beforeEach(function () {
-		$this->sendHeaders = new \CacheControl\SendHeaders();
+		$this->page = \Kahlan\Plugin\Double::instance([
+			'extends' => \CacheControl\Page::class
+		]);
+		$this->sendHeaders = new \CacheControl\SendHeaders($this->page);
 
-		allow('is_admin')->toBeCalled()->andReturn(false);
-		allow('is_post_type_archive')->toBeCalled()->andReturn(false);
-		allow('is_front_page')->toBeCalled()->andReturn(false);
-		allow('is_home')->toBeCalled()->andReturn(false);
-		allow('is_user_logged_in')->toBeCalled()->andReturn(false);
-		allow('is_preview')->toBeCalled()->andReturn(false);
-		allow('get_post_type')->toBeCalled()->andReturn('post');
-		allow('get_post_taxonomies')->toBeCalled()->andReturn(['category', 'post_tag', 'custom-taxonomy']);
-		allow('get_page_template_slug')->toBeCalled()->andReturn('default');
+		global $post;
+		$post = (object) [];
+		allow($this->page)->toReceive('isAdmin')->andReturn(false);
+		allow($this->page)->toReceive('isArchivePage')->andReturn(false);
+		allow($this->page)->toReceive('isFrontPage')->andReturn(false);
+		allow($this->page)->toReceive('isHomePage')->andReturn(false);
+		allow($this->page)->toReceive('isLoggedInUser')->andReturn(false);
+		allow($this->page)->toReceive('isPreviewPage')->andReturn(false);
+		allow($this->page)->toReceive('postType')->andReturn('post');
+		allow($this->page)->toReceive('taxonomies')->andReturn(['category', 'post_tag', 'custom-taxonomy']);
+		allow($this->page)->toReceive('templateName')->andReturn('default');
+		allow($this->page)->toReceive('postId')->andReturn(0);
 		allow('get_post_types')->toBeCalled()->andReturn(['post', 'page', 'custom-post']);
 		allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
-		allow('get_post')->toBeCalled()->andReturn(null);
 
 		$this->config = [
 			'cache_control_plugin_developer_mode' => false,
@@ -146,11 +151,11 @@ describe(\CacheControl\SendHeaders::class, function () {
 	describe('->setCacheHeader()', function () {
 		context('we have a logged in user', function () {
 			beforeEach(function () {
-				allow('is_user_logged_in')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isLoggedInUser')->andReturn(true);
 			});
 
 			it('sets a private cache header for preview pages', function () {
-				allow('is_preview')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isPreviewPage')->andReturn(true);
 				expect('get_field')->toBeCalled()->once();
 
 				allow('header')->toBeCalled();
@@ -191,7 +196,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 		context('the user is not logged in', function () {
 			it('sets a private cache header for preview pages', function () {
-				allow('is_preview')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isPreviewPage')->andReturn(true);
 				expect('get_field')->toBeCalled()->once();
 
 				allow('header')->toBeCalled();
@@ -203,9 +208,9 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 		context('Testing developer-mode', function () {
 			beforeEach(function () {
-				allow('is_user_logged_in')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isLoggedInUser')->andReturn(true);
 				$this->config['cache_control_plugin_developer_mode'] = true;
-				allow('is_front_page')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isFrontPage')->andReturn(true);
 			});
 
 			it('is in developer mode on the local dev environment', function () {
@@ -273,11 +278,11 @@ describe(\CacheControl\SendHeaders::class, function () {
 				$this->config['cache_control_plugin_archives_cache'] = 120;
 				$this->config['cache_control_plugin_home_page_cache'] = 3600;
 
-				allow('is_home')->toBeCalled()->andReturn(true);
-				allow('is_post_type_archive')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isHomePage')->andReturn(true);
+				allow($this->page)->toReceive('isArchivePage')->andReturn(true);
 				$this->config['cache_control_plugin_developer_mode'] = true;
-				allow('is_front_page')->toBeCalled()->andReturn(false);
-				allow('get_page_template_slug')->toBeCalled()->andReturn('custom-template.php');
+				allow($this->page)->toReceive('isFrontPage')->andReturn(false);
+				allow($this->page)->toReceive('templateName')->andReturn('custom-template.php');
 
 				expect('get_post_types')->toBeCalled()->once();
 				expect('get_field')->toBeCalled()->times(1);
@@ -292,7 +297,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 		context("We don't have a logged in user and the wp_headers filter has values", function () {
 			beforeEach(function () {
 				// for simplicities sake we are using the front page for this example.
-				allow('is_front_page')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isFrontPage')->andReturn(true);
 			});
 			it('sets a cache-control header with no-cache', function () {
 				// we expect nothing to happen in this instance.
@@ -316,7 +321,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 		context('serving the front_page', function () {
 			beforeEach(function () {
-				allow('is_front_page')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isFrontPage')->andReturn(true);
 			});
 
 			context('has a config value of default', function () {
@@ -372,7 +377,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 				it('is in developer mode', function () {
 					$this->config['cache_control_plugin_developer_mode'] = true;
-					allow('is_front_page')->toBeCalled()->andReturn(true);
+					allow($this->page)->toReceive('IsFrontPage')->andReturn(true);
 
 					expect('get_post_types')->toBeCalled()->once();
 					expect('get_field')->toBeCalled()->times(3);
@@ -436,8 +441,8 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 		context('serving the home_page', function () {
 			beforeEach(function () {
-				allow('is_home')->toBeCalled()->andReturn(true);
-				allow('is_post_type_archive')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isHomePage')->andReturn(true);
+				allow($this->page)->toReceive('isArchivePage')->andReturn(true);
 			});
 
 			it('There is no non-default configuration', function () {
@@ -481,7 +486,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('is configured is also the front page which has default config', function () {
-					allow('is_front_page')->toBeCalled()->andReturn(true);
+					allow($this->page)->toReceive('isFrontPage')->andReturn(true);
 					expect('get_field')->toBeCalled()->times(3);
 
 					allow('header')->toBeCalled();
@@ -491,7 +496,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('is configured is also the front page which has config of 1hr', function () {
-					allow('is_front_page')->toBeCalled()->andReturn(true);
+					allow($this->page)->toReceive('isFrontPage')->andReturn(true);
 					$this->config['cache_control_plugin_front_page_cache'] = '3600';
 					expect('get_field')->toBeCalled()->times(3);
 
@@ -504,7 +509,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			context('home page is not configured', function () {
 				beforeEach(function () {
-					allow('get_post_type')->toBeCalled()->andReturn('post');
+					allow($this->page)->toReceive('postType')->andReturn('post');
 				});
 
 				it('archive is configured', function () {
@@ -558,7 +563,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 		context('archive page tests', function () {
 			beforeEach(function () {
-				allow('is_post_type_archive')->toBeCalled()->andReturn(true);
+				allow($this->page)->toReceive('isArchivePage')->andReturn(true);
 			});
 
 			it('There is no non-default configuration', function () {
@@ -702,11 +707,6 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 		context('individual post tests', function () {
 			beforeEach(function () {
-				$this->postObj = Double::instance([
-					'class' => 'WP_Post',
-				]);
-				$this->postObj->ID = 2;
-
 				$this->config['field_cache_control_individual_post_settings'] = [
 					[
 						'cache_control_individual_post_post_id' => 2,
@@ -716,7 +716,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			});
 
 			it('current page has no post ID', function () {
-				allow('get_post')->toBeCalled()->andReturn(null);
+				allow($this->page)->toReceive('postId')->andReturn(0);
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
 
@@ -724,7 +724,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			});
 
 			it('current page has post ID, and a cache override is configured', function () {
-				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow($this->page)->toReceive('postId')->andReturn(2);
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=120, public');
 
@@ -738,7 +738,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 						'cache_control_individual_post_cache_age' => 'default'
 					]
 				];
-				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow($this->page)->toReceive('postId')->andReturn(2);
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
 
@@ -752,7 +752,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 						'cache_control_individual_post_cache_age' => 120
 					]
 				];
-				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow($this->page)->toReceive('postId')->andReturn(2);
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
 
@@ -760,9 +760,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			});
 
 			it('current page has post ID, but not one configured with a cache override', function () {
-				$this->postObj->ID = 3;
-
-				allow('get_post')->toBeCalled()->andReturn($this->postObj);
+				allow($this->page)->toReceive('postId')->andReturn(3);
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
 
@@ -805,7 +803,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 			context('post_type is page', function () {
 				beforeEach(function () {
-					allow('get_post_type')->toBeCalled()->andReturn('page');
+					allow($this->page)->toReceive('postType')->andReturn('page');
 				});
 
 				it('has the overridden by taxonomy flag set to false', function () {
@@ -819,7 +817,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 				});
 
 				it('is a password protected page', function () {
-					allow($this->sendHeaders)->toReceive('hasPassword')->andReturn(true);
+					allow($this->page)->toReceive('requiresPassword')->andReturn(true);
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('Cache-Control: no-cache, no-store, private');
@@ -918,7 +916,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 			});
 
 			it('categories list has an unexpected taxonomy value', function () {
-				allow('get_post_taxonomies')->toBeCalled()->andReturn(['category', 'post_tag', 'custom-taxonomy', 'nonsense']);
+				allow($this->page)->toReceive('taxonomies')->andReturn(['category', 'post_tag', 'custom-taxonomy', 'nonsense']);
 
 				expect('get_field')->toBeCalled()->times(1);
 				expect('get_sub_field')->toBeCalled()->times(11);
@@ -936,8 +934,8 @@ describe(\CacheControl\SendHeaders::class, function () {
 				$this->config['cache_control_taxonomy_category_settings']['cache_control_taxonomy_category_cache_age'] = 1800;
 				$this->config['cache_control_template_page-custom_settings']['cache_control_template_page-custom_cache_age'] = 604800;
 
-				allow('get_post_type')->toBeCalled()->andReturn('page');
-				allow('get_page_template_slug')->toBeCalled()->andReturn('page-custom.php');
+				allow($this->page)->toReceive('postType')->andReturn('page');
+				allow($this->page)->toReceive('templateName')->andReturn('page-custom.php');
 			});
 
 			it('has a custom template and overridden by template set to false', function () {
