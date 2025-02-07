@@ -68,7 +68,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				$this->templateConfig();
 				$this->archiveConfig();
 				$this->homePageConfig();
-				$this->getPageConfiguration();
+				$this->sendDevelopmentHeaders();
 			}
 
 			/** @psalm-suppress TypeDoesNotContainType */
@@ -345,7 +345,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	protected function getPageConfiguration(): void
+	protected function sendDevelopmentHeaders(): void
 	{
 		if ($this->developerMode) {
 			header('Meta-cc-configured-max-age: ' . $this->maxAge);
