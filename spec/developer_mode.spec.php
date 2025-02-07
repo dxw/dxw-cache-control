@@ -60,17 +60,15 @@ describe(\CacheControl\DeveloperMode::class, function () {
 		context('environment type is local', function () {
 			it('returns the option value', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
-				allow('get_field')->toBeCalled()->andReturn(true, false);
+				allow('get_field')->toBeCalled()->andReturn(true);
 				expect($this->developerMode->active())->toEqual(true);
-				expect($this->developerMode->active())->toEqual(false);
 			});
 		});
 		context('environment type is development', function () {
 			it('returns the option value', function () {
 				allow('wp_get_environment_type')->toBeCalled()->andReturn('development');
-				allow('get_field')->toBeCalled()->andReturn(true, false);
+				allow('get_field')->toBeCalled()->andReturn(true);
 				expect($this->developerMode->active())->toEqual(true);
-				expect($this->developerMode->active())->toEqual(false);
 			});
 		});
 		context('environment type is anything else', function () {
@@ -79,6 +77,14 @@ describe(\CacheControl\DeveloperMode::class, function () {
 				expect('get_field')->not->toBeCalled();
 				expect($this->developerMode->active())->toEqual(false);
 			});
+		});
+		it('memo-ises the value so only needs to call logic once', function () {
+			allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
+			expect('wp_get_environment_type')->toBeCalled()->once();
+			allow('get_field')->toBeCalled()->andReturn(true);
+			expect('get_field')->toBeCalled()->once();
+			expect($this->developerMode->active())->toEqual(true);
+			expect($this->developerMode->active())->toEqual(true);
 		});
 	});
 });
