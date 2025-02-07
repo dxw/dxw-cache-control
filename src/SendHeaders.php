@@ -132,7 +132,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected function getPageProperties(): void
 	{
 		$this->pageProperties = [
-			'isArchivePage' => is_post_type_archive(),
 			'isFrontPage' => is_front_page(),
 			'isHomePage' => is_home(),
 			'isLoggedInUser' => is_user_logged_in(),
@@ -150,7 +149,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-taxonomy:' . implode(',', $this->pageProperties['taxonomies']));
 			header('Meta-cc-front-page: ' . ($this->pageProperties['isFrontPage'] ? 'yes' : 'no'));
 			header('Meta-cc-home-page: ' . ($this->pageProperties['isHomePage'] ? 'yes' : 'no'));
-			header('Meta-cc-archive: ' . ($this->pageProperties['isArchivePage'] ? 'yes' : 'no'));
+			header('Meta-cc-archive: ' . (is_post_type_archive() ? 'yes' : 'no'));
 			header('Meta-cc-is-admin: ' . (is_admin() ? 'yes' : 'no'));
 			header('Meta-cc-logged-in-user: ' . ($this->pageProperties['isLoggedInUser'] ? 'yes' : 'no'));
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
@@ -305,7 +304,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	public function archiveConfig()
 	{
-		if ($this->pageProperties['isArchivePage']) {
+		if (is_post_type_archive()) {
 			// Do we have a configured taxonomy cache age?
 			if ($this->taxMaxAge != 'default') {
 				$this->currentConfig = 'taxonomy';
