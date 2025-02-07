@@ -67,6 +67,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				$this->taxonomyConfig();
 				$this->templateConfig();
 				$this->archiveConfig();
+				$this->homePageConfig();
 				$this->getPageConfiguration();
 			}
 
@@ -345,8 +346,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if ($this->developerMode) {
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
-
-		$this->homePageConfig();
 
 		if ($this->developerMode) {
 			header('Meta-cc-configured-max-age: ' . $this->maxAge);
