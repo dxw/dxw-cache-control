@@ -37,8 +37,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		$this->sendDefaultDevelopmentHeaders();
 
-		// if we are logged in, or on the front page we don't need to worry about configuring things further
-		if (is_user_logged_in() || $this->hasPassword() || is_preview()) {
+		if ($this->isKnownUser()) {
 			header('Cache-Control: no-cache, no-store, private');
 			return;
 		}
@@ -82,6 +81,14 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 
 		header('Cache-Control: max-age=' . $this->maxAge . ', public');
+	}
+
+	private function isKnownUser()
+	{
+		return
+			is_user_logged_in()
+			|| $this->hasPassword()
+			|| is_preview();
 	}
 
 	protected function sendDefaultDevelopmentHeaders(): void
