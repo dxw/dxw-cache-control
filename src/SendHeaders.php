@@ -65,6 +65,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				$this->postConfig();
 				$this->postTypeConfig();
 				$this->taxonomyConfig();
+				$this->templateConfig();
 				$this->getPageConfiguration();
 			}
 
@@ -302,8 +303,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if ($this->developerMode) {
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
-
-		$this->templateConfig();
 
 		if ($this->pageProperties['isArchivePage']) {
 			// Do we have a configured taxonomy cache age?
