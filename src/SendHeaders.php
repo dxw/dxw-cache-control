@@ -133,7 +133,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	{
 		$this->pageProperties = [
 			'templateName' => get_page_template_slug() ?: 'default',
-			'postId' => $this->getPostId()
 		];
 
 		// If we are in developer mode we want to see what the current page is setting.
@@ -148,7 +147,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
 			header('Meta-cc-requires-password: ' . ($this->hasPassword() ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
-			header('Meta-cc-post-id: ' . $this->pageProperties['postId']);
+			header('Meta-cc-post-id: ' . $this->getPostId());
 		}
 	}
 
@@ -158,7 +157,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if (have_rows('field_cache_control_individual_post_settings', 'options')) {
 			$rows = get_field('field_cache_control_individual_post_settings', 'options');
 			foreach ($rows as $row) {
-				if (!empty($row['cache_control_individual_post_post_id']) && $this->pageProperties['postId'] == $row['cache_control_individual_post_post_id']) {
+				if (!empty($row['cache_control_individual_post_post_id']) && $this->getPostId() == $row['cache_control_individual_post_post_id']) {
 					if ($row['cache_control_individual_post_cache_age'] != 'default') {
 						$this->maxAge = $row['cache_control_individual_post_cache_age'];
 					}
