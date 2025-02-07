@@ -122,6 +122,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		return 0;
 	}
 
+	public function getTemplateSlug()
+	{
+		return get_page_template_slug() ?? 'default';
+	}
+
 	/**
 	 * getPageProperties
 	 *
@@ -131,9 +136,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	 */
 	protected function getPageProperties(): void
 	{
-		$this->pageProperties = [
-			'templateName' => get_page_template_slug() ?: 'default',
-		];
+		$this->pageProperties = ['placeholder'];
 
 		// If we are in developer mode we want to see what the current page is setting.
 		if ($this->developerMode) {
@@ -144,7 +147,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-archive: ' . (is_post_type_archive() ? 'yes' : 'no'));
 			header('Meta-cc-is-admin: ' . (is_admin() ? 'yes' : 'no'));
 			header('Meta-cc-logged-in-user: ' . (is_user_logged_in() ? 'yes' : 'no'));
-			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
+			header('Meta-cc-template_name: ' . $this->getTemplateSlug());
 			header('Meta-cc-requires-password: ' . ($this->hasPassword() ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
 			header('Meta-cc-post-id: ' . $this->getPostId());
@@ -264,8 +267,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		];
 
 		// Get template options.
-		if ($this->pageProperties['templateName'] != 'default') {
-			$localTemplateFile = preg_replace('/\.php$/', '', $this->pageProperties['templateName']);
+		if ($this->getTemplateSlug() != 'default') {
+			$localTemplateFile = preg_replace('/\.php$/', '', $this->getTemplateSlug());
 			if ($this->developerMode) {
 				header('Meta-cc-config-template-local-name: ' . $localTemplateFile);
 			}
