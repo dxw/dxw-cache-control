@@ -298,12 +298,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	protected function getPageConfiguration(): void
+	public function archiveConfig()
 	{
-		if ($this->developerMode) {
-			header('Meta-cc-individual-page-cache-setting-triggered: No');
-		}
-
 		if ($this->pageProperties['isArchivePage']) {
 			// Do we have a configured taxonomy cache age?
 			if ($this->taxMaxAge != 'default') {
@@ -325,6 +321,15 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				}
 			}
 		}
+	}
+
+	protected function getPageConfiguration(): void
+	{
+		if ($this->developerMode) {
+			header('Meta-cc-individual-page-cache-setting-triggered: No');
+		}
+
+		$this->archiveConfig();
 
 		if ($this->pageProperties['isHomePage']) {
 			if (is_string(get_field('cache_control_plugin_home_page_cache', 'option'))) {
