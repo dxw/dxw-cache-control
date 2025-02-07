@@ -6,7 +6,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 {
 	protected int $maxAge = 86400;
 	protected bool $overridesArchive = false;
-	protected bool $developerMode = false;
+	protected DeveloperMode $developerMode;
 	protected bool $overriddenByTaxonomy = false;
 	protected string $currentConfig = 'default';
 	protected Page $page;
@@ -15,9 +15,10 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected string $archiveCacheAge = 'default';
 	protected array $headers = [];
 
-	public function __construct(\CacheControl\Page $page)
+	public function __construct(\CacheControl\Page $page, \CacheControl\DeveloperMode $developerMode)
 	{
 		$this->page = $page;
+		$this->developerMode = $developerMode;
 	}
 
 	public function register(): void
@@ -35,14 +36,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	public function setCacheHeader(): void
 	{
-		if (wp_get_environment_type() === 'local' || wp_get_environment_type() === 'development') {
-			$this->developerMode = get_field('cache_control_plugin_developer_mode', 'option') ?? false;
-		}
-
-		$this->outputDeveloperMeta();
+		$this->addDeveloperMeta();
 
 		// if we are logged in, or on the front page we don't need to worry about configuring things further
 		if ($this->page->isLoggedInUser() || $this->page->requiresPassword() || $this->page->isPreviewPage()) {
+			$this->developerMode->output();
 			header('Cache-Control: no-cache, no-store, private');
 			return;
 		}
@@ -57,6 +55,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			&& array_key_exists('Cache-Control', $this->headers)
 			&& preg_match('/no-cache/', $this->headers['Cache-Control'])
 		) {
+			$this->developerMode->output();
 			return;
 		}
 
@@ -68,54 +67,48 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				$this->currentConfig = 'frontPage';
 				$this->maxAge = (int) $this->frontPageCacheAge;
 			}
-			if ($this->developerMode) {
-				header('X-Debug-dxw-Cache-Control-front-page-cache-value: ' . $this->frontPageCacheAge);
-				header('X-Debug-dxw-Cache-Control-configured-max-age: ' . $this->maxAge);
-			}
+			$this->developerMode->addHeader('front-page-cache-value', $this->frontPageCacheAge);
+			$this->developerMode->addHeader('configured-max-age', $this->maxAge);
 		} else {
 			$this->getPageConfiguration();
 		}
 
 		/** @psalm-suppress TypeDoesNotContainType */
 		if ($this->page->isLoggedInUser()) {
-			header('X-Debug-dxw-Cache-Control-configured-cache: no-cache (logged in user)');
+			$this->developerMode->addHeader('configured-cache', 'no-cache (logged in user)');
 		}
 		/** @psalm-suppress TypeDoesNotContainType */
 		if ($this->page->requiresPassword()) {
-			header('X-Debug-dxw-Cache-Control-configured-cache: no-cache (requires password)');
+			$this->developerMode->addHeader('configured-cache', 'no-cache (requires password)');
 		}
-		if ($this->developerMode) {
-			header('X-Debug-dxw-Cache-Control-currently-used-config: ' . $this->currentConfig);
-			header('X-Debug-dxw-Cache-Control-final-configured-max-age: ' . $this->maxAge);
-		}
+		$this->developerMode->addHeader('currently-used-config', $this->currentConfig);
+		$this->developerMode->addHeader('final-configured-max-age', $this->maxAge);
 
+		$this->developerMode->output();
 		header('Cache-Control: max-age=' . $this->maxAge .', public');
 	}
 
 	/**
-	 * outputDeveloperMeta
+	 * addDeveloperMeta
 	 *
 	 * Output additional info headers
 	 * If in developer mode
 	 *
 	 * @return void
 	 */
-	protected function outputDeveloperMeta(): void
+	protected function addDeveloperMeta(): void
 	{
-		// If we are in developer mode we want to see what the current page is setting.
-		if ($this->developerMode) {
-			header('X-Debug-dxw-Cache-Control-post-type: ' . $this->page->postType());
-			header('X-Debug-dxw-Cache-Control-taxonomy:' . implode(',', $this->page->taxonomies()));
-			header('X-Debug-dxw-Cache-Control-front-page: ' . ($this->page->isFrontPage() ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-home-page: ' . ($this->page->isHomePage() ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-archive: ' . ($this->page->isArchivePage() ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-is-admin: ' . ($this->page->isAdmin() ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-logged-in-user: ' . ($this->page->isLoggedInUser() ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-template_name: ' . $this->page->templateName());
-			header('X-Debug-dxw-Cache-Control-requires-password: ' . ($this->page->requiresPassword() ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-post-types: ' . implode(',', get_post_types(['public' => true])));
-			header('X-Debug-dxw-Cache-Control-post-id: '. $this->page->postId());
-		}
+		$this->developerMode->addHeader('post-type', $this->page->postType());
+		$this->developerMode->addHeader('taxonomy', implode(',', $this->page->taxonomies()));
+		$this->developerMode->addHeader('front-page', $this->page->isFrontPage() ? 'yes' : 'no');
+		$this->developerMode->addHeader('home-page', $this->page->isHomePage() ? 'yes' : 'no');
+		$this->developerMode->addHeader('archive', $this->page->isArchivePage() ? 'yes' : 'no');
+		$this->developerMode->addHeader('is-admin', $this->page->isAdmin() ? 'yes' : 'no');
+		$this->developerMode->addHeader('logged-in-user', $this->page->isLoggedInUser() ? 'yes' : 'no');
+		$this->developerMode->addHeader('template_name', $this->page->templateName());
+		$this->developerMode->addHeader('requires-password', $this->page->requiresPassword() ? 'yes' : 'no');
+		$this->developerMode->addHeader('post-types', implode(',', get_post_types(['public' => true])));
+		$this->developerMode->addHeader('post-id', $this->page->postId());
 	}
 
 	protected function getPageConfiguration(): void
@@ -148,18 +141,16 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 						$this->maxAge = $row['cache_control_individual_post_cache_age'];
 					}
 
-					if ($this->developerMode) {
-						header('X-Debug-dxw-Cache-Control-config-individual-post-max-age: ' . $this->maxAge);
-						header('X-Debug-dxw-Cache-Control-individual-page-cache-setting-triggered: Yes');
-						header('X-Debug-dxw-Cache-Control-configured-max-age: ' . $this->maxAge);
-					}
+
+					$this->developerMode->addHeader('config-individual-post-max-age', $this->maxAge);
+					$this->developerMode->addHeader('individual-page-cache-setting-triggered', 'Yes');
+					$this->developerMode->addHeader('configured-max-age', $this->maxAge);
 					return;
 				}
 			}
 		}
-		if ($this->developerMode) {
-			header('X-Debug-dxw-Cache-Control-individual-page-cache-setting-triggered: No');
-		}
+		$this->developerMode->addHeader('individual-page-cache-setting-triggered', 'No');
+
 
 		// Get post type options.
 		if (have_rows('cache_control_post_type_' . $this->page->postType() . '_settings', 'option')) {
@@ -185,12 +176,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				}
 			}
 		}
-		if ($this->developerMode) {
-			header('X-Debug-dxw-Cache-Control-config-post-type-max-age: ' . $postTypeConfig['maxAge']);
-			header('X-Debug-dxw-Cache-Control-config-post-type-overrides-archive: ' . ($postTypeConfig['overridesArchive'] ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-config-post-type-overridden-by-taxonomy: ' . ($postTypeConfig['overriddenByTaxonomy'] ? 'yes' : 'no'));
-			header('X-Debug-dxw-Cache-Control-config-post-type-overridden-by-template: ' . ($postTypeConfig['overriddenByTemplate'] ? 'yes' : 'no'));
-		}
+
+		$this->developerMode->addHeader('config-post-type-max-age', $postTypeConfig['maxAge']);
+		$this->developerMode->addHeader('config-post-type-overrides-archive', $postTypeConfig['overridesArchive'] ? 'yes' : 'no');
+		$this->developerMode->addHeader('config-post-type-overridden-by-taxonomy', $postTypeConfig['overriddenByTaxonomy'] ? 'yes' : 'no');
+		$this->developerMode->addHeader('config-post-type-overridden-by-template', $postTypeConfig['overriddenByTemplate'] ? 'yes' : 'no');
 
 		// Get taxonomy options.
 		if (count($this->page->taxonomies()) > 0 && !in_array('none', $this->page->taxonomies())) {
@@ -214,17 +204,16 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			$this->currentConfig = 'taxonomy';
 			$this->maxAge = $taxonomyConfig['maxAge'];
 		}
-		if ($this->developerMode) {
-			header('X-Debug-dxw-Cache-Control-config-taxonomy-max-age: ' . $taxonomyConfig['maxAge']);
-			header('X-Debug-dxw-Cache-Control-config-taxonomy-priority: ' . $taxonomyConfig['priority']);
-		}
+
+		$this->developerMode->addHeader('config-taxonomy-max-age', $taxonomyConfig['maxAge']);
+		$this->developerMode->addHeader('config-taxonomy-priority', $taxonomyConfig['priority']);
 
 		// Get template options.
 		if ($this->page->templateName() != 'default') {
 			$localTemplateFile = preg_replace('/\.php$/', '', $this->page->templateName());
-			if ($this->developerMode) {
-				header('X-Debug-dxw-Cache-Control-config-template-local-name: ' . $localTemplateFile);
-			}
+
+			$this->developerMode->addHeader('config-template-local-name', $localTemplateFile);
+
 			if (have_rows('cache_control_template_' . $localTemplateFile . '_settings', 'option')) {
 				while (have_rows('cache_control_template_' . $localTemplateFile . '_settings', 'option')) {
 					the_row();
@@ -244,10 +233,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			}
 		}
 
-		if ($this->developerMode) {
-			header('X-Debug-dxw-Cache-Control-config-template-max-age: ' . $templateConfig['maxAge']);
-			header('X-Debug-dxw-Cache-Control-config-taxonomy-priority: ' . ($templateConfig['overridesTaxonomy'] ? 'yes' : 'no'));
-		}
+		$this->developerMode->addHeader('config-template-max-age', $templateConfig['maxAge']);
+		$this->developerMode->addHeader('config-taxonomy-priority', $templateConfig['overridesTaxonomy'] ? 'yes' : 'no');
 
 		if ($this->page->isArchivePage()) {
 			// Do we have a configured taxonomy cache age?
@@ -263,9 +250,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 					if ($this->archiveCacheAge && $this->archiveCacheAge != 'default') {
 						$this->currentConfig = 'archive';
 						$this->maxAge = (int) $this->archiveCacheAge;
-						if ($this->developerMode) {
-							header('X-Debug-dxw-Cache-Control-archive-cache-value: ' . $this->archiveCacheAge);
-						}
+						$this->developerMode->addHeader('archive-cache-value', $this->archiveCacheAge);
 					}
 				}
 			}
@@ -278,15 +263,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			if ($this->homePageCacheAge && $this->homePageCacheAge != 'default') {
 				$this->currentConfig = 'homePage';
 				$this->maxAge = (int) $this->homePageCacheAge;
-				if ($this->developerMode) {
-					header('X-Debug-dxw-Cache-Control-home-page-cache-value: ' . $this->homePageCacheAge);
-				}
+				$this->developerMode->addHeader('home-page-cache-value', $this->homePageCacheAge);
 			}
 		}
 
-		if ($this->developerMode) {
-			header('X-Debug-dxw-Cache-Control-configured-max-age: ' . $this->maxAge);
-			header('X-Debug-dxw-Cache-Control-configured-overrides-archive: ' . ($this->overridesArchive ? 'yes' : 'no'));
-		}
+		$this->developerMode->addHeader('configured-max-age', $this->maxAge);
+		$this->developerMode->addHeader('configured-overrides-archive', $this->overridesArchive ? 'yes' : 'no');
 	}
 }
