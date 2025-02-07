@@ -214,21 +214,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	protected function getPageConfiguration(): void
+	public function taxonomyConfig()
 	{
-		if ($this->developerMode) {
-			header('Meta-cc-individual-page-cache-setting-triggered: No');
-		}
-
-		$postTypeConfig = [
-			'maxAge' => 'default',
-			'overridesArchive' => false,
-			'overriddenByTaxonomy' => true,
-			'overriddenByTemplate' => true,
-		];
-
-		$this->postTypeConfig($postTypeConfig);
-
 		$taxonomyConfig = [
 			'maxAge' => 'default',
 			'priority' => 999
@@ -261,6 +248,24 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-config-taxonomy-max-age: ' . $taxonomyConfig['maxAge']);
 			header('Meta-cc-config-taxonomy-priority: ' . $taxonomyConfig['priority']);
 		}
+	}
+
+	protected function getPageConfiguration(): void
+	{
+		if ($this->developerMode) {
+			header('Meta-cc-individual-page-cache-setting-triggered: No');
+		}
+
+		$postTypeConfig = [
+			'maxAge' => 'default',
+			'overridesArchive' => false,
+			'overriddenByTaxonomy' => true,
+			'overriddenByTemplate' => true,
+		];
+
+		$this->postTypeConfig($postTypeConfig);
+
+		$this->taxonomyConfig();
 
 		$templateConfig = [
 			'maxAge' => 'default',
