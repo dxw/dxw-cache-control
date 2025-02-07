@@ -176,8 +176,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if ($this->developerMode) {
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
-		// Where is our cache config coming from currently
-		$this->currentConfig = 'default';
 
 		$postTypeConfig = [
 			'maxAge' => 'default',
