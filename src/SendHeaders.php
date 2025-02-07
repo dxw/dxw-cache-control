@@ -60,6 +60,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			if (is_front_page()) {
 				$this->frontPageConfig();
 			} else {
+				$this->postConfig();
 				$this->getPageConfiguration();
 			}
 
@@ -177,8 +178,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	protected function getPageConfiguration(): void
 	{
-		$this->postConfig();
-
 		if ($this->developerMode) {
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
