@@ -132,7 +132,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected function getPageProperties(): void
 	{
 		$this->pageProperties = [
-			'isHomePage' => is_home(),
 			'isLoggedInUser' => is_user_logged_in(),
 			'isPreviewPage' => is_preview(),
 			'postType' => get_post_type() ?? 'unknown',
@@ -147,7 +146,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-post-type: ' . $this->pageProperties['postType']);
 			header('Meta-cc-taxonomy:' . implode(',', $this->pageProperties['taxonomies']));
 			header('Meta-cc-front-page: ' . (is_front_page() ? 'yes' : 'no'));
-			header('Meta-cc-home-page: ' . ($this->pageProperties['isHomePage'] ? 'yes' : 'no'));
+			header('Meta-cc-home-page: ' . (is_home() ? 'yes' : 'no'));
 			header('Meta-cc-archive: ' . (is_post_type_archive() ? 'yes' : 'no'));
 			header('Meta-cc-is-admin: ' . (is_admin() ? 'yes' : 'no'));
 			header('Meta-cc-logged-in-user: ' . ($this->pageProperties['isLoggedInUser'] ? 'yes' : 'no'));
@@ -328,7 +327,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	public function homePageConfig()
 	{
-		if ($this->pageProperties['isHomePage']) {
+		if (is_home()) {
 			if (is_string(get_field('cache_control_plugin_home_page_cache', 'option'))) {
 				$this->homePageCacheAge = get_field('cache_control_plugin_home_page_cache', 'option');
 			}
