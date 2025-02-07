@@ -181,6 +181,10 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				}
 			}
 		}
+
+		if ($this->developerMode) {
+			header('Meta-cc-individual-page-cache-setting-triggered: No');
+		}
 	}
 
 	public function postTypeConfig()
@@ -343,10 +347,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	protected function getPageConfiguration(): void
 	{
-		if ($this->developerMode) {
-			header('Meta-cc-individual-page-cache-setting-triggered: No');
-		}
-
 		if ($this->developerMode) {
 			header('Meta-cc-configured-max-age: ' . $this->maxAge);
 			header('Meta-cc-configured-overrides-archive: ' . ($this->overridesArchive ? 'yes' : 'no'));
