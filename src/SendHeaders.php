@@ -155,25 +155,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 	protected function getPageConfiguration(): void
 	{
-		// Where is our cache config coming from currently
-		$this->currentConfig = 'default';
-
-		// Our cache type config containers.
-		$postTypeConfig = [
-			'maxAge' => 'default',
-			'overridesArchive' => false,
-			'overriddenByTaxonomy' => true,
-			'overriddenByTemplate' => true,
-		];
-		$taxonomyConfig = [
-			'maxAge' => 'default',
-			'priority' => 999
-		];
-		$templateConfig = [
-			'maxAge' => 'default',
-			'overridesTaxonomy' => false,
-		];
-
 		// Check if we have an individual cache configured for this page and return this value if we do
 		if (have_rows('field_cache_control_individual_post_settings', 'options')) {
 			$rows = get_field('field_cache_control_individual_post_settings', 'options');
@@ -195,6 +176,15 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if ($this->developerMode) {
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
+		// Where is our cache config coming from currently
+		$this->currentConfig = 'default';
+
+		$postTypeConfig = [
+			'maxAge' => 'default',
+			'overridesArchive' => false,
+			'overriddenByTaxonomy' => true,
+			'overriddenByTemplate' => true,
+		];
 
 		// Get post type options.
 		if (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
@@ -227,6 +217,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-config-post-type-overridden-by-template: ' . ($postTypeConfig['overriddenByTemplate'] ? 'yes' : 'no'));
 		}
 
+		$taxonomyConfig = [
+			'maxAge' => 'default',
+			'priority' => 999
+		];
+
 		// Get taxonomy options.
 		if (count($this->pageProperties['taxonomies']) > 0 && !in_array('none', $this->pageProperties['taxonomies'])) {
 			foreach ($this->pageProperties['taxonomies'] as $taxonomy) {
@@ -253,6 +248,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-config-taxonomy-max-age: ' . $taxonomyConfig['maxAge']);
 			header('Meta-cc-config-taxonomy-priority: ' . $taxonomyConfig['priority']);
 		}
+
+		$templateConfig = [
+			'maxAge' => 'default',
+			'overridesTaxonomy' => false,
+		];
 
 		// Get template options.
 		if ($this->pageProperties['templateName'] != 'default') {
