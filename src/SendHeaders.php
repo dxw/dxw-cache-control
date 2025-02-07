@@ -35,7 +35,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			$this->developerMode = get_field('cache_control_plugin_developer_mode', 'option') ?? false;
 		}
 
-		//Get our page properties that we will be using to figure out our cache settings,
 		$this->sendDefaultDevelopmentHeaders();
 
 		// if we are logged in, or on the front page we don't need to worry about configuring things further
