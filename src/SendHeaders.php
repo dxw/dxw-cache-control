@@ -66,6 +66,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				$this->postTypeConfig();
 				$this->taxonomyConfig();
 				$this->templateConfig();
+				$this->archiveConfig();
 				$this->getPageConfiguration();
 			}
 
@@ -328,8 +329,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if ($this->developerMode) {
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
-
-		$this->archiveConfig();
 
 		if ($this->pageProperties['isHomePage']) {
 			if (is_string(get_field('cache_control_plugin_home_page_cache', 'option'))) {
