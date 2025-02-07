@@ -85,46 +85,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		header('Cache-Control: max-age=' . $this->maxAge . ', public');
 	}
 
-	private function frontPageConfig()
-	{
-		if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
-			$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
-		}
-		if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
-			$this->currentConfig = 'frontPage';
-			$this->maxAge = (int) $this->frontPageCacheAge;
-		}
-		if ($this->developerMode) {
-			header('Meta-cc-front-page-cache-value: ' . $this->frontPageCacheAge);
-			header('Meta-cc-configured-max-age: ' . $this->maxAge);
-		}
-	}
-
-	protected function hasPassword(): bool
-	{
-		global $post;
-
-		return !empty($post->post_password);
-	}
-
-	/**
-	 * @psalm-suppress ArgumentTypeCoercion
-	 */
-	protected function getPostId(): int
-	{
-		$post = get_post();
-
-		if (is_a($post, 'WP_Post')) {
-			return $post->ID;
-		}
-		return 0;
-	}
-
-	public function getTemplateSlug()
-	{
-		return get_page_template_slug() ?? 'default';
-	}
-
 	protected function sendDefaultDevelopmentHeaders(): void
 	{
 		// If we are in developer mode we want to see what the current page is setting.
@@ -140,6 +100,21 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-requires-password: ' . ($this->hasPassword() ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
 			header('Meta-cc-post-id: ' . $this->getPostId());
+		}
+	}
+
+	private function frontPageConfig()
+	{
+		if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
+			$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
+		}
+		if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
+			$this->currentConfig = 'frontPage';
+			$this->maxAge = (int) $this->frontPageCacheAge;
+		}
+		if ($this->developerMode) {
+			header('Meta-cc-front-page-cache-value: ' . $this->frontPageCacheAge);
+			header('Meta-cc-configured-max-age: ' . $this->maxAge);
 		}
 	}
 
@@ -333,5 +308,30 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-configured-max-age: ' . $this->maxAge);
 			header('Meta-cc-configured-overrides-archive: ' . ($this->overridesArchive ? 'yes' : 'no'));
 		}
+	}
+
+	protected function hasPassword(): bool
+	{
+		global $post;
+
+		return !empty($post->post_password);
+	}
+
+	/**
+	 * @psalm-suppress ArgumentTypeCoercion
+	 */
+	protected function getPostId(): int
+	{
+		$post = get_post();
+
+		if (is_a($post, 'WP_Post')) {
+			return $post->ID;
+		}
+		return 0;
+	}
+
+	public function getTemplateSlug()
+	{
+		return get_page_template_slug() ?? 'default';
 	}
 }
