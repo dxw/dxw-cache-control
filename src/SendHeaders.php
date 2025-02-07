@@ -132,7 +132,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected function getPageProperties(): void
 	{
 		$this->pageProperties = [
-			'isFrontPage' => is_front_page(),
 			'isHomePage' => is_home(),
 			'isLoggedInUser' => is_user_logged_in(),
 			'isPreviewPage' => is_preview(),
@@ -147,7 +146,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		if ($this->developerMode) {
 			header('Meta-cc-post-type: ' . $this->pageProperties['postType']);
 			header('Meta-cc-taxonomy:' . implode(',', $this->pageProperties['taxonomies']));
-			header('Meta-cc-front-page: ' . ($this->pageProperties['isFrontPage'] ? 'yes' : 'no'));
+			header('Meta-cc-front-page: ' . (is_front_page() ? 'yes' : 'no'));
 			header('Meta-cc-home-page: ' . ($this->pageProperties['isHomePage'] ? 'yes' : 'no'));
 			header('Meta-cc-archive: ' . (is_post_type_archive() ? 'yes' : 'no'));
 			header('Meta-cc-is-admin: ' . (is_admin() ? 'yes' : 'no'));
