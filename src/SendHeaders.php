@@ -41,7 +41,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		if (count($this->pageProperties)) {
 			// if we are logged in, or on the front page we don't need to worry about configuring things further
-			if ($this->pageProperties['isLoggedInUser'] || $this->pageProperties['requiresPassword'] || $this->pageProperties['isPreviewPage']) {
+			if (is_user_logged_in() || $this->pageProperties['requiresPassword'] || $this->pageProperties['isPreviewPage']) {
 				header('Cache-Control: no-cache, no-store, private');
 				return;
 			}
@@ -52,7 +52,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			 */
 			/** @psalm-suppress RedundantCondition */
 			if (
-				!$this->pageProperties['isLoggedInUser']
+				!is_user_logged_in()
 				&& array_key_exists('Cache-Control', $this->headers)
 				&& preg_match('/no-cache/', $this->headers['Cache-Control'])
 			) {
@@ -72,7 +72,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			}
 
 			/** @psalm-suppress TypeDoesNotContainType */
-			if ($this->pageProperties['isLoggedInUser']) {
+			if (is_user_logged_in()) {
 				header('Meta-cc-configured-cache: no-cache (logged in user)');
 			}
 			/** @psalm-suppress TypeDoesNotContainType */
@@ -132,7 +132,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected function getPageProperties(): void
 	{
 		$this->pageProperties = [
-			'isLoggedInUser' => is_user_logged_in(),
 			'isPreviewPage' => is_preview(),
 			'postType' => get_post_type() ?? 'unknown',
 			'taxonomies' => get_post_taxonomies() ?? ['none'],
@@ -149,7 +148,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-home-page: ' . (is_home() ? 'yes' : 'no'));
 			header('Meta-cc-archive: ' . (is_post_type_archive() ? 'yes' : 'no'));
 			header('Meta-cc-is-admin: ' . (is_admin() ? 'yes' : 'no'));
-			header('Meta-cc-logged-in-user: ' . ($this->pageProperties['isLoggedInUser'] ? 'yes' : 'no'));
+			header('Meta-cc-logged-in-user: ' . (is_user_logged_in() ? 'yes' : 'no'));
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
 			header('Meta-cc-requires-password: ' . ($this->pageProperties['requiresPassword'] ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
