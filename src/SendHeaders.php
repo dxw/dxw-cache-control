@@ -37,13 +37,13 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		$this->sendDefaultDevelopmentHeaders();
 
-		if ($this->isKnownUser()) {
-			header('Cache-Control: no-cache, no-store, private');
+		/** @psalm-suppress RedundantCondition */
+		if ($this->isIneligibleForCacheControl()) {
 			return;
 		}
 
-		/** @psalm-suppress RedundantCondition */
-		if ($this->isIneligibleForCacheControl()) {
+		if ($this->isKnownUser()) {
+			header('Cache-Control: no-cache, no-store, private');
 			return;
 		}
 
