@@ -25,17 +25,60 @@ describe(\CacheControl\DeveloperMode::class, function () {
 		});
 	});
 	describe('->output()', function () {
-		it('outputs no headers when none have been added', function () {
-			expect('header')->not->toBeCalled();
-			$this->developerMode->output();
+		context('developer mode is active', function () {
+			beforeEach(function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
+				allow('get_field')->toBeCalled()->andReturn(true);
+			});
+			it('outputs no headers when none have been added', function () {
+				expect('header')->not->toBeCalled();
+				$this->developerMode->output();
+			});
+			it('outputs headers when they have been added', function () {
+				allow('header')->toBeCalled();
+				$this->developerMode->addHeader('foo', 'bar');
+				$this->developerMode->addHeader('moo', 123);
+				expect('header')->toBeCalled()->once()->with(CacheControl\DeveloperMode::PREFIX . "foo: bar");
+				expect('header')->toBeCalled()->once()->with(CacheControl\DeveloperMode::PREFIX . "moo: 123");
+				$this->developerMode->output();
+			});
 		});
-		it('outputs headers when they have been added', function () {
-			allow('header')->toBeCalled();
-			$this->developerMode->addHeader('foo', 'bar');
-			$this->developerMode->addHeader('moo', 123);
-			expect('header')->toBeCalled()->once()->with(CacheControl\DeveloperMode::PREFIX . "foo: bar");
-			expect('header')->toBeCalled()->once()->with(CacheControl\DeveloperMode::PREFIX . "moo: 123");
-			$this->developerMode->output();
+		context('developer mode is inactive', function () {
+			beforeEach(function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('production');
+			});
+			it('does nothing', function () {
+				$this->developerMode->addHeader('foo', 'bar');
+				$this->developerMode->addHeader('moo', 123);
+				expect('header')->not->toBeCalled();
+				$this->developerMode->output();
+			});
+		});
+	});
+
+	describe('->active()', function () {
+		context('environment type is local', function () {
+			it('returns the option value', function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
+				allow('get_field')->toBeCalled()->andReturn(true, false);
+				expect($this->developerMode->active())->toEqual(true);
+				expect($this->developerMode->active())->toEqual(false);
+			});
+		});
+		context('environment type is development', function () {
+			it('returns the option value', function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('development');
+				allow('get_field')->toBeCalled()->andReturn(true, false);
+				expect($this->developerMode->active())->toEqual(true);
+				expect($this->developerMode->active())->toEqual(false);
+			});
+		});
+		context('environment type is anything else', function () {
+			it('returns false', function () {
+				allow('wp_get_environment_type')->toBeCalled()->andReturn('production');
+				expect('get_field')->not->toBeCalled();
+				expect($this->developerMode->active())->toEqual(false);
+			});
 		});
 	});
 });
