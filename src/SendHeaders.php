@@ -76,7 +76,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				header('Meta-cc-final-configured-max-age: ' . $this->maxAge);
 			}
 		}
-		header('Cache-Control: max-age=' . $this->maxAge .', public');
+		header('Cache-Control: max-age=' . $this->maxAge . ', public');
 	}
 
 	private function frontPageConfig()
@@ -149,11 +149,11 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
 			header('Meta-cc-requires-password: ' . ($this->pageProperties['requiresPassword'] ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
-			header('Meta-cc-post-id: '. $this->pageProperties['postId']);
+			header('Meta-cc-post-id: ' . $this->pageProperties['postId']);
 		}
 	}
 
-	protected function getPageConfiguration(): void
+	public function postConfig()
 	{
 		// Check if we have an individual cache configured for this page and return this value if we do
 		if (have_rows('field_cache_control_individual_post_settings', 'options')) {
@@ -173,6 +173,12 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				}
 			}
 		}
+	}
+
+	protected function getPageConfiguration(): void
+	{
+		$this->postConfig();
+
 		if ($this->developerMode) {
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
