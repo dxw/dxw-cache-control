@@ -324,12 +324,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	protected function getPageConfiguration(): void
+	public function homePageConfig()
 	{
-		if ($this->developerMode) {
-			header('Meta-cc-individual-page-cache-setting-triggered: No');
-		}
-
 		if ($this->pageProperties['isHomePage']) {
 			if (is_string(get_field('cache_control_plugin_home_page_cache', 'option'))) {
 				$this->homePageCacheAge = get_field('cache_control_plugin_home_page_cache', 'option');
@@ -342,6 +338,15 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				}
 			}
 		}
+	}
+
+	protected function getPageConfiguration(): void
+	{
+		if ($this->developerMode) {
+			header('Meta-cc-individual-page-cache-setting-triggered: No');
+		}
+
+		$this->homePageConfig();
 
 		if ($this->developerMode) {
 			header('Meta-cc-configured-max-age: ' . $this->maxAge);
