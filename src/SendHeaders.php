@@ -132,7 +132,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected function getPageProperties(): void
 	{
 		$this->pageProperties = [
-			'taxonomies' => get_post_taxonomies() ?? ['none'],
 			'templateName' => get_page_template_slug() ?: 'default',
 			'requiresPassword' => $this->hasPassword(),
 			'postId' => $this->getPostId()
@@ -141,7 +140,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		// If we are in developer mode we want to see what the current page is setting.
 		if ($this->developerMode) {
 			header('Meta-cc-post-type: ' . get_post_type() ?: 'unknown');
-			header('Meta-cc-taxonomy:' . implode(',', $this->pageProperties['taxonomies']));
+			header('Meta-cc-taxonomy:' . implode(',', get_post_taxonomies()));
 			header('Meta-cc-front-page: ' . (is_front_page() ? 'yes' : 'no'));
 			header('Meta-cc-home-page: ' . (is_home() ? 'yes' : 'no'));
 			header('Meta-cc-archive: ' . (is_post_type_archive() ? 'yes' : 'no'));
@@ -231,8 +230,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		];
 
 		// Get taxonomy options.
-		if (count($this->pageProperties['taxonomies']) > 0 && !in_array('none', $this->pageProperties['taxonomies'])) {
-			foreach ($this->pageProperties['taxonomies'] as $taxonomy) {
+		if (count(get_post_taxonomies()) > 0) {
+			foreach (get_post_taxonomies() as $taxonomy) {
 				if (have_rows('cache_control_taxonomy_' . $taxonomy . '_settings', 'option')) {
 					while (have_rows('cache_control_taxonomy_' . $taxonomy . '_settings', 'option')) {
 						the_row();
