@@ -57,18 +57,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				return;
 			}
 
-			if ($this->pageProperties['isFrontPage']) {
-				if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
-					$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
-				}
-				if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
-					$this->currentConfig = 'frontPage';
-					$this->maxAge = (int) $this->frontPageCacheAge;
-				}
-				if ($this->developerMode) {
-					header('Meta-cc-front-page-cache-value: ' . $this->frontPageCacheAge);
-					header('Meta-cc-configured-max-age: ' . $this->maxAge);
-				}
+			if (is_front_page()) {
+				$this->frontPageConfig();
 			} else {
 				$this->getPageConfiguration();
 			}
@@ -87,6 +77,21 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			}
 		}
 		header('Cache-Control: max-age=' . $this->maxAge .', public');
+	}
+
+	private function frontPageConfig()
+	{
+		if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
+			$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
+		}
+		if ($this->frontPageCacheAge && $this->frontPageCacheAge != 'default') {
+			$this->currentConfig = 'frontPage';
+			$this->maxAge = (int) $this->frontPageCacheAge;
+		}
+		if ($this->developerMode) {
+			header('Meta-cc-front-page-cache-value: ' . $this->frontPageCacheAge);
+			header('Meta-cc-configured-max-age: ' . $this->maxAge);
+		}
 	}
 
 	protected function hasPassword(): bool

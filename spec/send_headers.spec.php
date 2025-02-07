@@ -144,6 +144,71 @@ describe(\CacheControl\SendHeaders::class, function () {
 	});
 
 	describe('->setCacheHeader()', function () {
+		// beforeEach(function () {
+		// 	allow('wp_get_environment_type')->toBeCalled();
+		// 	allow('is_admin')->toBeCalled();
+		// 	allow('is_post_type_archive')->toBeCalled();
+		// 	allow('is_front_page')->toBeCalled();
+		// 	allow('is_home')->toBeCalled();
+		// 	allow('is_user_logged_in')->toBeCalled();
+		// 	allow('is_preview')->toBeCalled();
+		// 	allow('get_post_type')->toBeCalled();
+		// 	allow('get_post_taxonomies')->toBeCalled();
+		// 	allow('get_page_template_slug')->toBeCalled();
+		// 	allow('get_post')->toBeCalled();
+		// 	allow('have_rows')->toBeCalled();
+		// 	allow('header')->toBeCalled();
+		// });
+		//
+		// fit('description', function () {
+		//
+		// 	expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+		//
+		// 	$this->sendHeaders->setCacheHeader();
+		// });
+		//
+		// context('given the front page', function () {
+		// 	beforeEach(function () {
+		// 		allow('is_front_page')->toBeCalled()->andReturn(true);
+		// 	});
+		// 	context('and no max age is configured in the site admin', function () {
+		// 		fit('sets a header with the default max age', function () {
+		// 			allow('get_field')->toBeCalled()->andReturn(null);
+		// 			expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+		//
+		// 			$this->sendHeaders ->setCacheHeader();
+		// 		});
+		// 	});
+		// 	context('and a "default" max age is configured in the site admin', function () {
+		// 		fit('sets a header with the default max age', function () {
+		// 			allow('get_field')->toBeCalled()->andReturn('default');
+		// 			expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=86400, public');
+		//
+		// 			$this->sendHeaders ->setCacheHeader();
+		// 		});
+		// 	});
+		// 	context('and a custom max age configured in the site admin', function () {
+		// 		fit('sets a header with that max age', function () {
+		// 			allow('get_field')->toBeCalled()->andReturn('120');
+		// 			expect('header')->toBeCalled()->once()->with('Cache-Control: max-age=120, public');
+		//
+		// 			$this->sendHeaders ->setCacheHeader();
+		// 		});
+		// 	});
+		// 	context('and developer mode', function () {
+		// 		fit('sets an is_admin header with "true"', function () {
+		// 			allow('wp_get_environment_type')->toBeCalled()->andReturn('local');
+		// 			allow('get_field')->toBeCalled()->with('cache_control_plugin_developer_mode')->andReturn(true);
+		// 			allow('get_post_types')->toBeCalled()->andReturn([]);
+		// 			allow('get_field')->toBeCalled()->andReturn('120');
+		//
+		// 			expect('header')->toBeCalled()->times(16);
+		// 			expect('header')->toContain('Meta-cc-front-page-cache-value');
+		//
+		// 			$this->sendHeaders ->setCacheHeader();
+		// 		});
+		// 	});
+		// });
 		context('we have a logged in user', function () {
 			beforeEach(function () {
 				allow('is_user_logged_in')->toBeCalled()->andReturn(true);
