@@ -41,7 +41,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		if (count($this->pageProperties)) {
 			// if we are logged in, or on the front page we don't need to worry about configuring things further
-			if (is_user_logged_in() || $this->pageProperties['requiresPassword'] || $this->pageProperties['isPreviewPage']) {
+			if (is_user_logged_in() || $this->pageProperties['requiresPassword'] || is_preview()) {
 				header('Cache-Control: no-cache, no-store, private');
 				return;
 			}
@@ -132,7 +132,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected function getPageProperties(): void
 	{
 		$this->pageProperties = [
-			'isPreviewPage' => is_preview(),
 			'postType' => get_post_type() ?? 'unknown',
 			'taxonomies' => get_post_taxonomies() ?? ['none'],
 			'templateName' => get_page_template_slug() ?: 'default',
