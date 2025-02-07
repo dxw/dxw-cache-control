@@ -36,7 +36,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 
 		//Get our page properties that we will be using to figure out our cache settings,
-		$this->getPageProperties();
+		$this->sendDefaultDevelopmentHeaders();
 
 		// if we are logged in, or on the front page we don't need to worry about configuring things further
 		if (is_user_logged_in() || $this->hasPassword() || is_preview()) {
@@ -66,7 +66,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			$this->templateConfig();
 			$this->archiveConfig();
 			$this->homePageConfig();
-			$this->sendDevelopmentHeaders();
+			$this->sendUpdatedDevelopmentHeaders();
 		}
 
 		/** @psalm-suppress TypeDoesNotContainType */
@@ -125,14 +125,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		return get_page_template_slug() ?? 'default';
 	}
 
-	/**
-	 * getPageProperties
-	 *
-	 * Populate our page properties for the page we are on, set $this->pageValues.
-	 *
-	 * @return void
-	 */
-	protected function getPageProperties(): void
+	protected function sendDefaultDevelopmentHeaders(): void
 	{
 		// If we are in developer mode we want to see what the current page is setting.
 		if ($this->developerMode) {
@@ -334,7 +327,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	protected function sendDevelopmentHeaders(): void
+	protected function sendUpdatedDevelopmentHeaders(): void
 	{
 		if ($this->developerMode) {
 			header('Meta-cc-configured-max-age: ' . $this->maxAge);
