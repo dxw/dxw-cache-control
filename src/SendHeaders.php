@@ -178,8 +178,15 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	public function postTypeConfig($postTypeConfig)
+	public function postTypeConfig()
 	{
+		$postTypeConfig = [
+			'maxAge' => 'default',
+			'overridesArchive' => false,
+			'overriddenByTaxonomy' => true,
+			'overriddenByTemplate' => true,
+		];
+
 		// Get post type options.
 		if (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
 			while (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
@@ -256,14 +263,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-individual-page-cache-setting-triggered: No');
 		}
 
-		$postTypeConfig = [
-			'maxAge' => 'default',
-			'overridesArchive' => false,
-			'overriddenByTaxonomy' => true,
-			'overriddenByTemplate' => true,
-		];
-
-		$this->postTypeConfig($postTypeConfig);
+		$this->postTypeConfig();
 
 		$this->taxonomyConfig();
 
