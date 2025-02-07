@@ -259,12 +259,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	protected function getPageConfiguration(): void
+	public function templateConfig()
 	{
-		if ($this->developerMode) {
-			header('Meta-cc-individual-page-cache-setting-triggered: No');
-		}
-
 		$templateConfig = [
 			'maxAge' => 'default',
 			'overridesTaxonomy' => false,
@@ -299,6 +295,15 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-config-template-max-age: ' . $templateConfig['maxAge']);
 			header('Meta-cc-config-taxonomy-priority: ' . ($templateConfig['overridesTaxonomy'] ? 'yes' : 'no'));
 		}
+	}
+
+	protected function getPageConfiguration(): void
+	{
+		if ($this->developerMode) {
+			header('Meta-cc-individual-page-cache-setting-triggered: No');
+		}
+
+		$this->templateConfig();
 
 		if ($this->pageProperties['isArchivePage']) {
 			// Do we have a configured taxonomy cache age?
