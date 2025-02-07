@@ -132,7 +132,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected function getPageProperties(): void
 	{
 		$this->pageProperties = [
-			'postType' => get_post_type() ?? 'unknown',
 			'taxonomies' => get_post_taxonomies() ?? ['none'],
 			'templateName' => get_page_template_slug() ?: 'default',
 			'requiresPassword' => $this->hasPassword(),
@@ -141,7 +140,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		// If we are in developer mode we want to see what the current page is setting.
 		if ($this->developerMode) {
-			header('Meta-cc-post-type: ' . $this->pageProperties['postType']);
+			header('Meta-cc-post-type: ' . get_post_type() ?: 'unknown');
 			header('Meta-cc-taxonomy:' . implode(',', $this->pageProperties['taxonomies']));
 			header('Meta-cc-front-page: ' . (is_front_page() ? 'yes' : 'no'));
 			header('Meta-cc-home-page: ' . (is_home() ? 'yes' : 'no'));
@@ -191,18 +190,18 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		];
 
 		// Get post type options.
-		if (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
-			while (have_rows('cache_control_post_type_' . $this->pageProperties['postType'] . '_settings', 'option')) {
+		if (have_rows('cache_control_post_type_' . get_post_type() . '_settings', 'option')) {
+			while (have_rows('cache_control_post_type_' . get_post_type() . '_settings', 'option')) {
 				the_row();
-				$postTypeConfig['maxAge'] = get_sub_field('cache_control_post_type_' . $this->pageProperties['postType'] . '_cache_age');
-				if ($this->pageProperties['postType'] != 'page') {
-					$postTypeConfig['overridesArchive'] = get_sub_field('cache_control_post_type_' . $this->pageProperties['postType'] . '_override_archive');
+				$postTypeConfig['maxAge'] = get_sub_field('cache_control_post_type_' . get_post_type() . '_cache_age');
+				if (get_post_type() != 'page') {
+					$postTypeConfig['overridesArchive'] = get_sub_field('cache_control_post_type_' . get_post_type() . '_override_archive');
 				}
 				$postTypeConfig['overriddenByTaxonomy'] = get_sub_field(
-					'cache_control_post_type_' . $this->pageProperties['postType'] . '_overridden_by_taxonomy'
+					'cache_control_post_type_' . get_post_type() . '_overridden_by_taxonomy'
 				) ?: false;
 				$postTypeConfig['overriddenByTemplate'] = get_sub_field(
-					'cache_control_post_type_' . $this->pageProperties['postType'] . '_overridden_by_template'
+					'cache_control_post_type_' . get_post_type() . '_overridden_by_template'
 				) ?: false;
 
 				$this->overriddenByTemplate = $postTypeConfig['overriddenByTemplate'];
