@@ -42,16 +42,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			return;
 		}
 
-		/*
-			 * If something is setting no-cache using the wp_headers filter
-			 * we don't want to mess with that
-			 */
 		/** @psalm-suppress RedundantCondition */
-		if (
-			!is_user_logged_in()
-			&& array_key_exists('Cache-Control', $this->headers)
-			&& preg_match('/no-cache/', $this->headers['Cache-Control'])
-		) {
+		if ($this->isIneligibleForCacheControl()) {
 			return;
 		}
 
@@ -81,6 +73,14 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 
 		header('Cache-Control: max-age=' . $this->maxAge . ', public');
+	}
+
+	private function isIneligibleForCacheControl()
+	{
+		return
+			!is_user_logged_in()
+			&& array_key_exists('Cache-Control', $this->headers)
+			&& preg_match('/no-cache/', $this->headers['Cache-Control']);
 	}
 
 	private function isKnownUser()
