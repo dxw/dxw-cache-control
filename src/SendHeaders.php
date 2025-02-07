@@ -8,6 +8,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected bool $overridesArchive = false;
 	protected bool $developerMode = false;
 	protected bool $overriddenByTaxonomy = false;
+	protected bool $overriddenByTemplate = false;
 	protected string $currentConfig = 'default';
 	protected array $pageProperties = [];
 	protected string $homePageCacheAge = 'default';
@@ -204,6 +205,8 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 					'cache_control_post_type_' . $this->pageProperties['postType'] . '_overridden_by_template'
 				) ?: false;
 
+				$this->overriddenByTemplate = $postTypeConfig['overriddenByTemplate'];
+
 				// Only set these values if the maxAge is set to a value other than default.
 				if ($postTypeConfig['maxAge'] != 'default') {
 					$this->currentConfig = 'postType';
@@ -273,7 +276,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 		if ($templateConfig['maxAge'] != 'default') {
 			if (
-				($this->currentConfig == 'postType' && $postTypeConfig['overriddenByTemplate'])
+				($this->currentConfig == 'postType' && $this->overriddenByTemplate)
 				||
 				($this->currentConfig == 'taxonomy' && $templateConfig['overridesTaxonomy'])
 			) {
