@@ -5,6 +5,7 @@ namespace CacheControl;
 class SendHeaders implements \Dxw\Iguana\Registerable
 {
 	protected int $maxAge = 86400;
+	protected $taxMaxAge = 'default';
 	protected bool $overridesArchive = false;
 	protected bool $developerMode = false;
 	protected bool $overriddenByTaxonomy = false;
@@ -244,6 +245,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 							$localPriority = get_sub_field('cache_control_taxonomy_' . $taxonomy . '_priority');
 							if ($localMaxAge != 'default' && $localPriority < $taxonomyConfig['priority']) {
 								$taxonomyConfig['maxAge'] = $localMaxAge;
+								$this->taxMaxAge = $taxonomyConfig['maxAge'];
 								$taxonomyConfig['priority'] = $localPriority;
 							}
 						}
@@ -297,9 +299,9 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		if ($this->pageProperties['isArchivePage']) {
 			// Do we have a configured taxonomy cache age?
-			if ($taxonomyConfig['maxAge'] != 'default') {
+			if ($this->taxMaxAge != 'default') {
 				$this->currentConfig = 'taxonomy';
-				$this->maxAge = $taxonomyConfig['maxAge'];
+				$this->maxAge = $this->taxMaxAge;
 			} else {
 				// Does the pastType override archive settings;
 				if (!$this->overridesArchive) {
