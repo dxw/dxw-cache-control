@@ -11,7 +11,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected bool $overriddenByTaxonomy = false;
 	protected bool $overriddenByTemplate = false;
 	protected string $currentConfig = 'default';
-	protected array $pageProperties = [];
 	protected string $homePageCacheAge = 'default';
 	protected string $frontPageCacheAge = 'default';
 	protected string $archiveCacheAge = 'default';
@@ -39,51 +38,50 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		//Get our page properties that we will be using to figure out our cache settings,
 		$this->getPageProperties();
 
-		if (count($this->pageProperties)) {
-			// if we are logged in, or on the front page we don't need to worry about configuring things further
-			if (is_user_logged_in() || $this->hasPassword() || is_preview()) {
-				header('Cache-Control: no-cache, no-store, private');
-				return;
-			}
+		// if we are logged in, or on the front page we don't need to worry about configuring things further
+		if (is_user_logged_in() || $this->hasPassword() || is_preview()) {
+			header('Cache-Control: no-cache, no-store, private');
+			return;
+		}
 
-			/*
+		/*
 			 * If something is setting no-cache using the wp_headers filter
 			 * we don't want to mess with that
 			 */
-			/** @psalm-suppress RedundantCondition */
-			if (
-				!is_user_logged_in()
-				&& array_key_exists('Cache-Control', $this->headers)
-				&& preg_match('/no-cache/', $this->headers['Cache-Control'])
-			) {
-				return;
-			}
-
-			if (is_front_page()) {
-				$this->frontPageConfig();
-			} else {
-				$this->postConfig();
-				$this->postTypeConfig();
-				$this->taxonomyConfig();
-				$this->templateConfig();
-				$this->archiveConfig();
-				$this->homePageConfig();
-				$this->sendDevelopmentHeaders();
-			}
-
-			/** @psalm-suppress TypeDoesNotContainType */
-			if (is_user_logged_in()) {
-				header('Meta-cc-configured-cache: no-cache (logged in user)');
-			}
-			/** @psalm-suppress TypeDoesNotContainType */
-			if ($this->hasPassword()) {
-				header('Meta-cc-configured-cache: no-cache (requires password)');
-			}
-			if ($this->developerMode) {
-				header('Meta-cc-currently-used-config: ' . $this->currentConfig);
-				header('Meta-cc-final-configured-max-age: ' . $this->maxAge);
-			}
+		/** @psalm-suppress RedundantCondition */
+		if (
+			!is_user_logged_in()
+			&& array_key_exists('Cache-Control', $this->headers)
+			&& preg_match('/no-cache/', $this->headers['Cache-Control'])
+		) {
+			return;
 		}
+
+		if (is_front_page()) {
+			$this->frontPageConfig();
+		} else {
+			$this->postConfig();
+			$this->postTypeConfig();
+			$this->taxonomyConfig();
+			$this->templateConfig();
+			$this->archiveConfig();
+			$this->homePageConfig();
+			$this->sendDevelopmentHeaders();
+		}
+
+		/** @psalm-suppress TypeDoesNotContainType */
+		if (is_user_logged_in()) {
+			header('Meta-cc-configured-cache: no-cache (logged in user)');
+		}
+		/** @psalm-suppress TypeDoesNotContainType */
+		if ($this->hasPassword()) {
+			header('Meta-cc-configured-cache: no-cache (requires password)');
+		}
+		if ($this->developerMode) {
+			header('Meta-cc-currently-used-config: ' . $this->currentConfig);
+			header('Meta-cc-final-configured-max-age: ' . $this->maxAge);
+		}
+
 		header('Cache-Control: max-age=' . $this->maxAge . ', public');
 	}
 
@@ -136,8 +134,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	 */
 	protected function getPageProperties(): void
 	{
-		$this->pageProperties = ['placeholder'];
-
 		// If we are in developer mode we want to see what the current page is setting.
 		if ($this->developerMode) {
 			header('Meta-cc-post-type: ' . get_post_type() ?: 'unknown');
