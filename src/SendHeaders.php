@@ -5,7 +5,7 @@ namespace CacheControl;
 class SendHeaders implements \Dxw\Iguana\Registerable
 {
 	protected int $maxAge = 86400;
-	protected $taxMaxAge = 'default';
+	protected int|string $taxMaxAge = 'default';
 	protected bool $overridesArchive = false;
 	protected bool $developerMode = false;
 	protected bool $overriddenByTaxonomy = false;
@@ -75,7 +75,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		header('Cache-Control: max-age=' . $this->maxAge . ', public');
 	}
 
-	private function isIneligibleForCacheControl()
+	private function isIneligibleForCacheControl(): bool
 	{
 		return
 			!is_user_logged_in()
@@ -83,7 +83,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			&& preg_match('/no-cache/', $this->headers['Cache-Control']);
 	}
 
-	private function isKnownUser()
+	private function isKnownUser(): bool
 	{
 		return
 			is_user_logged_in()
@@ -109,7 +109,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	private function frontPageConfig()
+	private function frontPageConfig(): void
 	{
 		if (is_string(get_field('cache_control_plugin_front_page_cache', 'option'))) {
 			$this->frontPageCacheAge = get_field('cache_control_plugin_front_page_cache', 'option');
@@ -124,7 +124,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	public function postConfig()
+	public function postConfig(): void
 	{
 		// Check if we have an individual cache configured for this page and return this value if we do
 		if (have_rows('field_cache_control_individual_post_settings', 'options')) {
@@ -150,7 +150,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	public function postTypeConfig()
+	public function postTypeConfig(): void
 	{
 		$postTypeConfig = [
 			'maxAge' => 'default',
@@ -193,7 +193,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	public function taxonomyConfig()
+	public function taxonomyConfig(): void
 	{
 		$taxonomyConfig = [
 			'maxAge' => 'default',
@@ -229,7 +229,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	public function templateConfig()
+	public function templateConfig(): void
 	{
 		$templateConfig = [
 			'maxAge' => 'default',
@@ -267,13 +267,13 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	public function archiveConfig()
+	public function archiveConfig(): void
 	{
 		if (is_post_type_archive()) {
 			// Do we have a configured taxonomy cache age?
 			if ($this->taxMaxAge != 'default') {
 				$this->currentConfig = 'taxonomy';
-				$this->maxAge = $this->taxMaxAge;
+				$this->maxAge = (int) $this->taxMaxAge;
 			} else {
 				// Does the pastType override archive settings;
 				if (!$this->overridesArchive) {
@@ -292,7 +292,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		}
 	}
 
-	public function homePageConfig()
+	public function homePageConfig(): void
 	{
 		if (is_home()) {
 			if (is_string(get_field('cache_control_plugin_home_page_cache', 'option'))) {
@@ -336,7 +336,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 		return 0;
 	}
 
-	public function getTemplateSlug()
+	public function getTemplateSlug(): string
 	{
 		return get_page_template_slug() ?? 'default';
 	}
