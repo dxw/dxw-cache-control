@@ -41,7 +41,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 
 		if (count($this->pageProperties)) {
 			// if we are logged in, or on the front page we don't need to worry about configuring things further
-			if (is_user_logged_in() || $this->pageProperties['requiresPassword'] || is_preview()) {
+			if (is_user_logged_in() || $this->hasPassword() || is_preview()) {
 				header('Cache-Control: no-cache, no-store, private');
 				return;
 			}
@@ -76,7 +76,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 				header('Meta-cc-configured-cache: no-cache (logged in user)');
 			}
 			/** @psalm-suppress TypeDoesNotContainType */
-			if ($this->pageProperties['requiresPassword']) {
+			if ($this->hasPassword()) {
 				header('Meta-cc-configured-cache: no-cache (requires password)');
 			}
 			if ($this->developerMode) {
@@ -133,7 +133,6 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	{
 		$this->pageProperties = [
 			'templateName' => get_page_template_slug() ?: 'default',
-			'requiresPassword' => $this->hasPassword(),
 			'postId' => $this->getPostId()
 		];
 
@@ -147,7 +146,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 			header('Meta-cc-is-admin: ' . (is_admin() ? 'yes' : 'no'));
 			header('Meta-cc-logged-in-user: ' . (is_user_logged_in() ? 'yes' : 'no'));
 			header('Meta-cc-template_name: ' . $this->pageProperties['templateName']);
-			header('Meta-cc-requires-password: ' . ($this->pageProperties['requiresPassword'] ? 'yes' : 'no'));
+			header('Meta-cc-requires-password: ' . ($this->hasPassword() ? 'yes' : 'no'));
 			header('Meta-cc-post-types: ' . implode(',', get_post_types(['public' => true])));
 			header('Meta-cc-post-id: ' . $this->pageProperties['postId']);
 		}
