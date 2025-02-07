@@ -9,7 +9,7 @@ class SendHeaders implements \Dxw\Iguana\Registerable
 	protected bool $developerMode = false;
 	protected bool $overriddenByTaxonomy = false;
 	protected string $currentConfig = 'default';
-	protected object $page;
+	protected Page $page;
 	protected string $homePageCacheAge = 'default';
 	protected string $frontPageCacheAge = 'default';
 	protected string $archiveCacheAge = 'default';
