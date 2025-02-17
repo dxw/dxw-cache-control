@@ -1,0 +1,5 @@
+#!/bin/sh
+script/update
+vendor/bin/php-cs-fixer fix --dry-run -vvv
+vendor/bin/psalm
+vendor/bin/kahlan spec
