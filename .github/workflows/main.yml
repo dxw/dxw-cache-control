@@ -27,6 +27,4 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction
       - run: |
-          vendor/bin/php-cs-fixer fix --dry-run -v --diff
-          vendor/bin/psalm
-          vendor/bin/kahlan
+          script/test
