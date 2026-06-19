@@ -7,7 +7,10 @@ describe(\CacheControl\SendHeaders::class, function () {
 		$this->page = \Kahlan\Plugin\Double::instance([
 			'extends' => \CacheControl\Page::class
 		]);
-		$this->sendHeaders = new \CacheControl\SendHeaders($this->page);
+		$this->developerMode = \Kahlan\Plugin\Double::instance([
+			'extends' => \CacheControl\DeveloperMode::class
+		]);
+		$this->sendHeaders = new \CacheControl\SendHeaders($this->page, $this->developerMode);
 
 		global $post;
 		$post = (object) [];
@@ -219,7 +222,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 				allow('header')->toBeCalled();
 				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-type: post');
-				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy:category,post_tag,custom-taxonomy');
+				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy: category,post_tag,custom-taxonomy');
 				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page: yes');
 				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-home-page: no');
 				expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-archive: no');
@@ -342,7 +345,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-type: post');
-					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy:category,post_tag,custom-taxonomy');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy: category,post_tag,custom-taxonomy');
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page: yes');
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-home-page: no');
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-archive: no');
@@ -384,7 +387,7 @@ describe(\CacheControl\SendHeaders::class, function () {
 
 					allow('header')->toBeCalled();
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-post-type: post');
-					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy:category,post_tag,custom-taxonomy');
+					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-taxonomy: category,post_tag,custom-taxonomy');
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-front-page: yes');
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-home-page: no');
 					expect('header')->toBeCalled()->once()->with('X-Debug-dxw-Cache-Control-archive: no');
